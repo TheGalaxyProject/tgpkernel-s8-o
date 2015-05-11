@@ -37,12 +37,6 @@ on init
 
     ffu
 
-# [ SEC_SELINUX_PORTING_COMMON
-    # for audit message
-    chown system system /proc/avc_msg
-    chmod 0660 /proc/avc_msg
-# ] SEC_SELINUX_PORTING_COMMON
-
     # Mix device-specific information into the entropy pool
     copy /proc/cmdline /dev/urandom
     copy /default.prop /dev/urandom
@@ -433,16 +427,6 @@ on late-fs
     class_start early_hal
 
 on post-fs-data
-# [ SEC_SELINUX_PORTING_COMMON
-# [ SEC_SELINUX_SPD
-    # Reload SE Android Policy
-    setprop selinux.reload_policy 1
-# ] SEC_SELINUX_SPD
-
-    # sec_efs_file
-    mkdir /efs/sec_efs 0775 radio system
-# ] SEC_SELINUX_PORTING_COMMON
-
     # We chown/chmod /data again so because mount is run as root + defaults
     chown system system /data
     chmod 0771 /data
@@ -526,17 +510,6 @@ on post-fs-data
 
     # Professioanl Audio
     mkdir /data/misc/jack 0770 jack system
-
-# [ SEC_SELINUX_PORTING_COMMON
-    mkdir /data/misc/audit 0775 audit system
-
-    # start auditd
-    start auditd
-# [ SEC_SELINUX_SPD
-    # Separate location for storing security policy files on data
-    mkdir /data/security 0701 system system
-# [ SEC_SELINUX_SPD
-# ] SEC_SELINUX_PORTING_COMMON
 
     mkdir /data/vendor 0771 root root
     mkdir /data/vendor/hardware 0771 root root
@@ -671,11 +644,6 @@ on post-fs-data
 
     # Check any timezone data in /data is newer than the copy in /system, delete if not.
     exec - system system -- /system/bin/tzdatacheck /system/usr/share/zoneinfo /data/misc/zoneinfo
-
-# [ SEC_SELINUX_PORTING_COMMON
-        restorecon --recursive --force /efs
-	restorecon_recursive /carrier
-# ] SEC_SELINUX_PORTING_COMMON
 
 # smart switch mobile
     mkdir /efs/ssm 0770 system system
@@ -1394,14 +1362,6 @@ service charon /system/bin/charon
     group vpn net_admin inet shell
     disabled
     oneshot
-
-# [ SEC_SELINUX_PORTING_COMMON
-service auditd /system/bin/auditd -k
-    class main
-    seclabel u:r:auditd:s0
-    disabled
-    oneshot
-# ] SEC_SELINUX_PORTING_COMMON
 
 service scs /system/bin/scs
     class main
