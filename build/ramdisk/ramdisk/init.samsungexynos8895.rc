@@ -594,7 +594,7 @@ on fs
     chown system radio /sys/class/sensors/accelerometer_sensor/selftest
     chown system radio /sys/class/sensors/accelerometer_sensor/lowpassfilter
     chown system radio /sys/class/sensors/accelerometer_sensor/dhr_sensor_info
-    
+
 # Proximity_sensor
     chown system radio /sys/class/sensors/proximity_sensor/raw_data
     chown system radio /sys/class/sensors/proximity_sensor/prox_avg
@@ -902,7 +902,7 @@ on property:sys.boot_completed=1
 
 on property:security.semdaemonfinish=1
     stop sem_daemon
-	
+
 service prepare_param /system/bin/prepare_param.sh /dev/block/platform/11120000.ufs/by-name/PARAM
     class core
     user root
