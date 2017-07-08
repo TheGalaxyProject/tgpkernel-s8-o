@@ -137,6 +137,13 @@ on post-fs-data
 
     chmod 0755 /sys/kernel/debug/tracing
 
+#Private Mode
+    mkdir /mnt/shell/privatemode 0700 system system
+    mkdir /storage/Private 0000 system system
+    mkdir /data/privatemode 0770 system system
+    chown system system /data/privatemode
+    restorecon /data/privatemode
+
 on boot
 # SSWAP
     write /proc/sys/vm/swappiness 160
