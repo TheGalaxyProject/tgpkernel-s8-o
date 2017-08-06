@@ -358,6 +358,21 @@ out:
 	return ret;
 }
 
+static struct mount *find_topper(struct mount *mnt)
+{
+	/* If there is exactly one mount covering mnt completely return it. */
+	struct mount *child;
+
+	if (!list_is_singular(&mnt->mnt_mounts))
+		return NULL;
+
+	child = list_first_entry(&mnt->mnt_mounts, struct mount, mnt_child);
+	if (child->mnt_mountpoint != mnt->mnt.mnt_root)
+		return NULL;
+
+	return child;
+}
+
 /*
  * return true if the refcount is greater than count
  */
@@ -378,7 +393,7 @@ static inline int do_refcount_check(struct mount *mnt, int count)
  */
 int propagate_mount_busy(struct mount *mnt, int refcnt)
 {
-	struct mount *m, *child;
+	struct mount *m, *child, *topper;
 	struct mount *parent = mnt->mnt_parent;
 	int ret = 0;
 
@@ -395,14 +410,22 @@ int propagate_mount_busy(struct mount *mnt, int refcnt)
 
 	for (m = propagation_next(parent, parent); m;
 	     		m = propagation_next(m, parent)) {
-#ifdef CONFIG_RKP_NS_PROT
-		child = __lookup_mnt_last(m->mnt, mnt->mnt_mountpoint);
-#else
-		child = __lookup_mnt_last(&m->mnt, mnt->mnt_mountpoint);
-#endif
-		if (child && list_empty(&child->mnt_mounts) &&
-		    (ret = do_refcount_check(child, 1)))
-			break;
+		int count = 1;
+		child = __lookup_mnt(&m->mnt, mnt->mnt_mountpoint);
+		if (!child)
+			continue;
+
+		/* Is there exactly one mount on the child that covers
+		 * it completely whose reference should be ignored?
+		 */
+		topper = find_topper(child);
+		if (topper)
+			count += 1;
+		else if (!list_empty(&child->mnt_mounts))
+			continue;
+
+		if (do_refcount_check(child, count))
+			return 1;
 	}
 	return ret;
 }
@@ -422,11 +445,11 @@ void propagate_mount_unlock(struct mount *mnt)
 	for (m = propagation_next(parent, parent); m;
 			m = propagation_next(m, parent)) {
 #ifdef CONFIG_RKP_NS_PROT
-		child = __lookup_mnt_last(m->mnt, mnt->mnt_mountpoint);
+		child = __lookup_mnt(&m->mnt, mnt->mnt_mountpoint);
 		if (child)
 			rkp_reset_mnt_flags(child->mnt,MNT_LOCKED);
 #else
-		child = __lookup_mnt_last(&m->mnt, mnt->mnt_mountpoint);
+		child = __lookup_mnt(&m->mnt, mnt->mnt_mountpoint);
 		if (child)
 			child->mnt.mnt_flags &= ~MNT_LOCKED;
 
@@ -447,12 +470,14 @@ static void mark_umount_candidates(struct mount *mnt)
 	for (m = propagation_next(parent, parent); m;
 			m = propagation_next(m, parent)) {
 #ifdef CONFIG_RKP_NS_PROT
-		struct mount *child = __lookup_mnt_last(m->mnt,
+		struct mount *child = __lookup_mnt(m->mnt,
 #else
-		struct mount *child = __lookup_mnt_last(&m->mnt,
+		struct mount *child = __lookup_mnt(&m->mnt,
 #endif
 						mnt->mnt_mountpoint);
-		if (child && (!IS_MNT_LOCKED(child) || IS_MNT_MARKED(m))) {
+		if (!child || (child->mnt.mnt_flags & MNT_UMOUNT))
+			continue;
+		if (!IS_MNT_LOCKED(child) || IS_MNT_MARKED(m)) {
 			SET_MNT_MARK(child);
 		}
 	}
@@ -471,11 +496,12 @@ static void __propagate_umount(struct mount *mnt)
 
 	for (m = propagation_next(parent, parent); m;
 			m = propagation_next(m, parent)) {
+		struct mount *topper;
 
 #ifdef CONFIG_RKP_NS_PROT
-		struct mount *child = __lookup_mnt_last(m->mnt,
+		struct mount *child = __lookup_mnt(m->mnt,
 #else
-		struct mount *child = __lookup_mnt_last(&m->mnt,
+		struct mount *child = __lookup_mnt(&m->mnt,
 #endif
 						mnt->mnt_mountpoint);
 		/*
@@ -485,6 +511,15 @@ static void __propagate_umount(struct mount *mnt)
 		if (!child || !IS_MNT_MARKED(child))
 			continue;
 		CLEAR_MNT_MARK(child);
+
+		/* If there is exactly one mount covering all of child
+		 * replace child with that mount.
+		 */
+		topper = find_topper(child);
+		if (topper)
+			mnt_change_mountpoint(child->mnt_parent, child->mnt_mp,
+					      topper);
+
 		if (list_empty(&child->mnt_mounts)) {
 			list_del_init(&child->mnt_child);
 #ifdef CONFIG_RKP_NS_PROT
