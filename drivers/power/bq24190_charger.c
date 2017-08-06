@@ -160,10 +160,7 @@
  * so the first read after a fault returns the latched value and subsequent
  * reads return the current value.  In order to return the fault status
  * to the user, have the interrupt handler save the reg's value and retrieve
- * it in the appropriate health/status routine.  Each routine has its own
- * flag indicating whether it should use the value stored by the last run
- * of the interrupt handler or do an actual reg read.  That way each routine
- * can report back whatever fault may have occured.
+ * it in the appropriate health/status routine.
  */
 struct bq24190_dev_info {
 	struct i2c_client		*client;
@@ -178,10 +175,6 @@ struct bq24190_dev_info {
 	unsigned int			gpio_int;
 	unsigned int			irq;
 	struct mutex			f_reg_lock;
-	bool				first_time;
-	bool				charger_health_valid;
-	bool				battery_health_valid;
-	bool				battery_status_valid;
 	u8				f_reg;
 	u8				ss_reg;
 	u8				watchdog;
@@ -674,21 +667,11 @@ static int bq24190_charger_get_health(struct bq24190_dev_info *bdi,
 		union power_supply_propval *val)
 {
 	u8 v;
-	int health, ret;
+	int health;
 
 	mutex_lock(&bdi->f_reg_lock);
-
-	if (bdi->charger_health_valid) {
-		v = bdi->f_reg;
-		bdi->charger_health_valid = false;
-		mutex_unlock(&bdi->f_reg_lock);
-	} else {
-		mutex_unlock(&bdi->f_reg_lock);
-
-		ret = bq24190_read(bdi, BQ24190_REG_F, &v);
-		if (ret < 0)
-			return ret;
-	}
+	v = bdi->f_reg;
+	mutex_unlock(&bdi->f_reg_lock);
 
 	if (v & BQ24190_REG_F_BOOST_FAULT_MASK) {
 		/*
@@ -1004,18 +987,8 @@ static int bq24190_battery_get_status(struct bq24190_dev_info *bdi,
 	int status, ret;
 
 	mutex_lock(&bdi->f_reg_lock);
-
-	if (bdi->battery_status_valid) {
-		chrg_fault = bdi->f_reg;
-		bdi->battery_status_valid = false;
-		mutex_unlock(&bdi->f_reg_lock);
-	} else {
-		mutex_unlock(&bdi->f_reg_lock);
-
-		ret = bq24190_read(bdi, BQ24190_REG_F, &chrg_fault);
-		if (ret < 0)
-			return ret;
-	}
+	chrg_fault = bdi->f_reg;
+	mutex_unlock(&bdi->f_reg_lock);
 
 	chrg_fault &= BQ24190_REG_F_CHRG_FAULT_MASK;
 	chrg_fault >>= BQ24190_REG_F_CHRG_FAULT_SHIFT;
@@ -1063,21 +1036,11 @@ static int bq24190_battery_get_health(struct bq24190_dev_info *bdi,
 		union power_supply_propval *val)
 {
 	u8 v;
-	int health, ret;
+	int health;
 
 	mutex_lock(&bdi->f_reg_lock);
-
-	if (bdi->battery_health_valid) {
-		v = bdi->f_reg;
-		bdi->battery_health_valid = false;
-		mutex_unlock(&bdi->f_reg_lock);
-	} else {
-		mutex_unlock(&bdi->f_reg_lock);
-
-		ret = bq24190_read(bdi, BQ24190_REG_F, &v);
-		if (ret < 0)
-			return ret;
-	}
+	v = bdi->f_reg;
+	mutex_unlock(&bdi->f_reg_lock);
 
 	if (v & BQ24190_REG_F_BAT_FAULT_MASK) {
 		health = POWER_SUPPLY_HEALTH_OVERVOLTAGE;
@@ -1464,9 +1427,12 @@ static irqreturn_t bq24190_irq_handler(int irq, void *data)
 static irqreturn_t bq24190_irq_handler_thread(int irq, void *data)
 {
 	struct bq24190_dev_info *bdi = data;
-	bool alert_userspace = false;
+	const u8 battery_mask_ss = BQ24190_REG_SS_CHRG_STAT_MASK;
+	const u8 battery_mask_f = BQ24190_REG_F_BAT_FAULT_MASK
+				| BQ24190_REG_F_NTC_FAULT_MASK;
+	bool alert_charger = false, alert_battery = false;
 	u8 ss_reg = 0, f_reg = 0;
-	int ret;
+	int i, ret;
 
 	pm_runtime_get_sync(bdi->dev);
 
@@ -1808,7 +1774,7 @@ static int bq24190_probe(struct i2c_client *client,
 	if (IS_ERR(bdi->charger)) {
 		dev_err(dev, "Can't register charger\n");
 		ret = PTR_ERR(bdi->charger);
-		goto out2;
+		goto out1;
 	}
 
 	battery_cfg.drv_data = bdi;
@@ -1817,7 +1783,7 @@ static int bq24190_probe(struct i2c_client *client,
 	if (IS_ERR(bdi->battery)) {
 		dev_err(dev, "Can't register battery\n");
 		ret = PTR_ERR(bdi->battery);
-		goto out3;
+		goto out2;
 	}
 
 #if 0
@@ -1851,6 +1817,15 @@ static int bq24190_probe(struct i2c_client *client,
 	ret = bq24190_sysfs_create_group(bdi);
 	if (ret) {
 		dev_err(dev, "Can't create sysfs entries\n");
+		goto out3;
+	}
+
+	ret = devm_request_threaded_irq(dev, bdi->irq, NULL,
+			bq24190_irq_handler_thread,
+			IRQF_TRIGGER_FALLING | IRQF_ONESHOT,
+			"bq24190-charger", bdi);
+	if (ret < 0) {
+		dev_err(dev, "Can't set up irq handler\n");
 		goto out4;
 	}
 
@@ -1864,12 +1839,13 @@ static int bq24190_probe(struct i2c_client *client,
 	return 0;
 
 out4:
-	power_supply_unregister(bdi->battery);
+	bq24190_sysfs_remove_group(bdi);
 out3:
-	power_supply_unregister(bdi->charger);
+	power_supply_unregister(bdi->battery);
 out2:
-	pm_runtime_disable(dev);
+	power_supply_unregister(bdi->charger);
 out1:
+	pm_runtime_disable(dev);
 	if (bdi->gpio_int)
 		gpio_free(bdi->gpio_int);
 
@@ -1907,9 +1883,9 @@ static int bq24190_pm_resume(struct device *dev)
 	struct bq24190_dev_info *bdi = i2c_get_clientdata(client);
 	int ret = 0;
 
-	bdi->charger_health_valid = false;
-	bdi->battery_health_valid = false;
-	bdi->battery_status_valid = false;
+	bdi->f_reg = 0;
+	bdi->ss_reg = BQ24190_REG_SS_VBUS_STAT_MASK; /* impossible state */
+
 
 	ret = bq24190_hw_init(bdi);
 	if (ret < 0)
