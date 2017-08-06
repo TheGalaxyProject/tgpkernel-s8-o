@@ -544,6 +544,13 @@ static struct socket *sock_alloc(void)
 
 	sock = SOCKET_I(inode);
 
+    /* START_OF_KNOX_VPN */
+    if(sock) {
+        sock->knox_sent = 0;
+        sock->knox_recv = 0;
+    }
+    /* END_OF_KNOX_VPN */
+
 	kmemcheck_annotate_bitfield(sock, type);
 	inode->i_ino = get_next_ino();
 	inode->i_mode = S_IFSOCK | S_IRWXUGO;
@@ -582,6 +589,10 @@ void sock_release(struct socket *sock)
 		iput(SOCK_INODE(sock));
 		return;
 	}
+    /* START_OF_KNOX_VPN */
+    sock->knox_sent = 0;
+    sock->knox_recv = 0;
+    /* END_OF_KNOX_VPN */
 	sock->file = NULL;
 }
 EXPORT_SYMBOL(sock_release);

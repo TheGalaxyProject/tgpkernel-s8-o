@@ -31,6 +31,8 @@
 #include <linux/init.h>
 #include <linux/sched.h>
 #include <linux/syscalls.h>
+#include <linux/exynos-ss.h>
+#include <soc/samsung/exynos-condbg.h>
 
 #include <asm/atomic.h>
 #include <asm/bug.h>
@@ -42,7 +44,11 @@
 #include <asm/exception.h>
 #include <asm/system_misc.h>
 
-static const char *handler[]= {
+#ifdef CONFIG_SEC_DEBUG
+#include <linux/sec_debug.h>
+#endif
+
+static const char *handler[] = {
 	"Synchronous Abort",
 	"IRQ",
 	"FIQ",
@@ -111,6 +117,17 @@ static void dump_backtrace_entry(unsigned long where)
 	print_ip_sym(where);
 }
 
+#ifdef CONFIG_SEC_DEBUG_AUTO_SUMMARY
+static void dump_backtrace_entry_auto_summary(unsigned long where)
+{
+	/*
+	 * Note that 'where' can have a physical address, but it's not handled.
+	 */
+	pr_auto(ASL2, "[<%p>] %pS\n", (void *)where, (void *)where);
+}
+#endif
+
+
 static void dump_instr(const char *lvl, struct pt_regs *regs)
 {
 	unsigned long addr = instruction_pointer(regs);
@@ -143,6 +160,32 @@ static void dump_instr(const char *lvl, struct pt_regs *regs)
 	set_fs(fs);
 }
 
+void show_exception_registers(struct pt_regs *regs)
+{
+	int i, top_reg;
+	u64 lr, sp;
+
+	if (compat_user_mode(regs)) {
+		lr = regs->compat_lr;
+		sp = regs->compat_sp;
+		top_reg = 12;
+	} else {
+		lr = regs->regs[30];
+		sp = regs->sp;
+		top_reg = 29;
+	}
+
+	printk("Exception registers at %p:\n", regs);
+	printk("pc : [<%016llx>] lr : [<%016llx>] pstate: %08llx\n",
+	       regs->pc, lr, regs->pstate);
+	printk("sp : %016llx\n", sp);
+	for (i = top_reg; i >= 0; i--) {
+		printk("x%-2d: %016llx ", i, regs->regs[i]);
+		if (i % 2 == 0)
+			printk("\n");
+	}
+}
+
 static void dump_backtrace(struct pt_regs *regs, struct task_struct *tsk)
 {
 	struct stackframe frame;
@@ -172,10 +215,57 @@ static void dump_backtrace(struct pt_regs *regs, struct task_struct *tsk)
 	pr_emerg("Call trace:\n");
 	while (1) {
 		unsigned long where = frame.pc;
-		unsigned long stack;
 		int ret;
 
 		dump_backtrace_entry(where);
+		ret = unwind_frame(&frame);
+		if (ret < 0)
+			break;
+
+		if (in_exception_text(where)) {
+			struct pt_regs *regs = container_of((void *)frame.fp,
+							    struct pt_regs,
+							    regs[29]);
+			show_exception_registers(regs);
+		}
+	}
+}
+
+#ifdef CONFIG_SEC_DEBUG_AUTO_SUMMARY
+static void dump_backtrace_auto_summary(struct pt_regs *regs, struct task_struct *tsk)
+{
+	struct stackframe frame;
+
+	pr_debug("%s(regs = %p tsk = %p)\n", __func__, regs, tsk);
+
+	if (!tsk)
+		tsk = current;
+
+	if (regs) {
+		frame.fp = regs->regs[29];
+		frame.sp = regs->sp;
+		frame.pc = regs->pc;
+	} else if (tsk == current) {
+		frame.fp = (unsigned long)__builtin_frame_address(0);
+		frame.sp = current_stack_pointer;
+		frame.pc = (unsigned long)dump_backtrace;
+	} else {
+		/*
+		 * task blocked in __switch_to
+		 */
+		frame.fp = thread_saved_fp(tsk);
+		frame.sp = thread_saved_sp(tsk);
+		frame.pc = thread_saved_pc(tsk);
+	}
+
+	pr_auto_once(2);
+	pr_auto(ASL2, "Call trace:\n");
+	while (1) {
+		unsigned long where = frame.pc;
+		unsigned long stack;
+		int ret;
+
+		dump_backtrace_entry_auto_summary(where);
 		ret = unwind_frame(&frame);
 		if (ret < 0)
 			break;
@@ -185,6 +275,7 @@ static void dump_backtrace(struct pt_regs *regs, struct task_struct *tsk)
 				 stack + sizeof(struct pt_regs), false);
 	}
 }
+#endif
 
 void show_stack(struct task_struct *tsk, unsigned long *sp)
 {
@@ -206,6 +297,7 @@ static int __die(const char *str, int err, struct thread_info *thread,
 	static int die_counter;
 	int ret;
 
+	ecd_printf("%s\n", str);
 	pr_emerg("Internal error: %s: %x [#%d]" S_PREEMPT S_SMP "\n",
 		 str, err, ++die_counter);
 
@@ -220,10 +312,21 @@ static int __die(const char *str, int err, struct thread_info *thread,
 		 TASK_COMM_LEN, tsk->comm, task_pid_nr(tsk), thread + 1);
 
 	if (!user_mode(regs) || in_interrupt()) {
-		dump_mem(KERN_EMERG, "Stack: ", regs->sp,
+		unsigned long sp = regs->sp;
+		if (sp < (unsigned long)task_stack_page(tsk)) {
+			pr_emerg("Error: regs->sp %08lx is out of range\n", sp);
+			sp = (unsigned long)task_stack_page(tsk);
+		}
+		dump_mem(KERN_EMERG, "Stack: ", sp,
 			 THREAD_SIZE + (unsigned long)task_stack_page(tsk),
 			 compat_user_mode(regs));
+
+#ifdef CONFIG_SEC_DEBUG_AUTO_SUMMARY
+		dump_backtrace_auto_summary(regs, tsk);
+#else
 		dump_backtrace(regs, tsk);
+#endif
+
 		dump_instr(KERN_EMERG, regs);
 	}
 
@@ -239,6 +342,9 @@ void die(const char *str, struct pt_regs *regs, int err)
 {
 	struct thread_info *thread = current_thread_info();
 	int ret;
+#ifdef CONFIG_SEC_DEBUG
+	char buf[SZ_256];
+#endif
 
 	oops_enter();
 
@@ -255,10 +361,28 @@ void die(const char *str, struct pt_regs *regs, int err)
 	raw_spin_unlock_irq(&die_lock);
 	oops_exit();
 
+#ifdef CONFIG_SEC_DEBUG_EXTRA_INFO
+	sec_debug_set_extra_info_backtrace(regs);
+#endif
+
+#ifdef CONFIG_SEC_DEBUG
+	if(regs)
+		snprintf(buf, sizeof(buf), "%s\nPC is at %pS\nLR is at %pS\n",
+			in_interrupt() ? "Fatal exception in interrupt" : "Fatal exception",
+			(void *)regs->pc, compat_user_mode(regs) ? (void *)regs->compat_lr : (void *)regs->regs[30]);
+	else
+		snprintf(buf, sizeof(buf), "%s\n",
+			in_interrupt() ? "Fatal exception in interrupt" : "Fatal exception");
+        
+	if (in_interrupt() || panic_on_oops)
+		panic(buf);
+#else
 	if (in_interrupt())
 		panic("Fatal exception in interrupt");
 	if (panic_on_oops)
 		panic("Fatal exception");
+#endif
+
 	if (ret != NOTIFY_STOP)
 		do_exit(SIGSEGV);
 }
@@ -338,7 +462,7 @@ exit:
 	return fn ? fn(regs, instr) : 1;
 }
 
-asmlinkage void __exception do_undefinstr(struct pt_regs *regs)
+asmlinkage void __exception do_undefinstr(struct pt_regs *regs, unsigned int esr)
 {
 	siginfo_t info;
 	void __user *pc = (void __user *)instruction_pointer(regs);
@@ -351,8 +475,8 @@ asmlinkage void __exception do_undefinstr(struct pt_regs *regs)
 		return;
 
 	if (unhandled_signal(current, SIGILL) && show_unhandled_signals_ratelimited()) {
-		pr_info("%s[%d]: undefined instruction: pc=%p\n",
-			current->comm, task_pid_nr(current), pc);
+		pr_info("%s[%d]: undefined instruction: pc=%p (0x%x)\n",
+			current->comm, task_pid_nr(current), pc, esr);
 		dump_instr(KERN_INFO, regs);
 	}
 
@@ -361,7 +485,11 @@ asmlinkage void __exception do_undefinstr(struct pt_regs *regs)
 	info.si_code  = ILL_ILLOPC;
 	info.si_addr  = pc;
 
-	arm64_notify_die("Oops - undefined instruction", regs, &info, 0);
+#ifdef CONFIG_SEC_DEBUG_EXTRA_INFO
+	if (!user_mode(regs))
+		sec_debug_set_extra_info_fault(-1, regs);
+#endif
+	arm64_notify_die("Oops - undefined instruction", regs, &info, esr);
 }
 
 long compat_arm_syscall(struct pt_regs *regs);
@@ -446,6 +574,13 @@ asmlinkage void bad_mode(struct pt_regs *regs, int reason, unsigned int esr)
 		handler[reason], esr, esr_get_class_string(esr));
 	__show_regs(regs);
 
+#ifdef CONFIG_SEC_DEBUG_EXTRA_INFO
+	if (!user_mode(regs)) {
+		sec_debug_set_extra_info_fault(SEC_DEBUG_BADMODE_MAGIC, regs);
+		sec_debug_set_extra_info_esr(esr);
+	}
+#endif
+
 	info.si_signo = SIGILL;
 	info.si_errno = 0;
 	info.si_code  = ILL_ILLOPC;
@@ -492,6 +627,12 @@ static int bug_handler(struct pt_regs *regs, unsigned int esr)
 {
 	if (user_mode(regs))
 		return DBG_HOOK_ERROR;
+
+	/*
+	 * If recalling hardlockup core has been run before,
+	 * PC value must be replaced to real PC value.
+	 */
+	exynos_ss_hook_hardlockup_entry((void *)regs);
 
 	switch (report_bug(regs->pc, regs)) {
 	case BUG_TRAP_TYPE_BUG:

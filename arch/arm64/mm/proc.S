@@ -225,9 +225,9 @@ ENDPROC(__cpu_setup)
 	 *       CE0      XWHW CZ     ME TEEA S
 	 * .... .IEE .... NEAI TE.I ..AD DEN0 ACAM
 	 * 0011 0... 1101 ..0. ..0. 10.. .0.. .... < hardware reserved
-	 * .... .1.. .... 01.1 11.1 ..01 0.01 1101 < software settings
+	 * .... .1.. .... 01.1 01.1 ..01 0.01 1101 < software settings
 	 */
 	.type	crval, #object
 crval:
 	.word	0xfcffffff			// clear
-	.word	0x34d5d91d			// set
+	.word	0x34d5591d			// set

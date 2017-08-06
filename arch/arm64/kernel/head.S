@@ -208,9 +208,21 @@ section_table:
 #endif
 
 ENTRY(stext)
+#ifdef CONFIG_RELOCATABLE_KERNEL
+	mov	x22, x1				// x1=PHYS_OFFSET
+	mov	x19, x2				// x2=real TEXT_OFFSET
+	adr	x21, __boot_kernel_offset
+	stp	x1, x2, [x21]
+#endif
 	bl	preserve_boot_args
 	bl	el2_setup			// Drop to EL1, w20=cpu_boot_mode
+#ifndef CONFIG_RELOCATABLE_KERNEL
 	adrp	x24, __PHYS_OFFSET
+#else
+	mov	x24, x22		// x24 = PHYS_OFFSET
+	sub	x23, x19, #TEXT_OFFSET		// x23 hold offset of KASLR
+#endif
+
 	bl	set_cpu_boot_mode_flag
 	bl	__create_page_tables		// x25=TTBR0, x26=TTBR1
 	/*
@@ -219,11 +231,47 @@ ENTRY(stext)
 	 * On return, the CPU will be ready for the MMU to be turned on and
 	 * the TCR will have been set.
 	 */
+#ifndef	CONFIG_RELOCATABLE_KERNEL
 	ldr	x27, =__mmap_switched		// address to jump to after
 						// MMU has been enabled
 	adr_l	lr, __enable_mmu		// return (PIC) address
 	b	__cpu_setup			// initialise processor
+#else
+	adr	x27, __relocate_kernel
+	sub x27, x27, x24
+	mov x12, #PAGE_OFFSET
+	add x27, x27, x12	// convert to VA
+	adr_l	lr, __enable_mmu		// return (PIC) address
+	b	__cpu_setup			// initialise processor
+#endif
 ENDPROC(stext)
+
+#ifdef CONFIG_RELOCATABLE_KERNEL
+#define R_AARCH64_RELATIVE	0x403
+
+__relocate_kernel:
+	adr_l 	x8, __dynsym_start
+	adr_l 	x9, __reloc_start
+	adr_l	x10, __reloc_end
+
+0:	cmp	x9, x10
+	b.hs	1f
+	ldp	x11, x12, [x9], #24
+	cmp	x12, #R_AARCH64_RELATIVE
+	b.ne	0b
+	ldr	x12, [x9, #-8]
+	add	x12, x12, x23			// relocate origin x23
+	str	x12, [x11, x23]
+	b	0b
+
+1:	adr_l	x8, vectors			// reload VBAR_EL1 with
+	msr	vbar_el1, x8			// relocated address
+	isb
+
+	adr_l	x9,  __mmap_switched
+	br	x9
+ENDPROC(__relocate_kernel)
+#endif
 
 /*
  * Preserve the arguments passed by the bootloader in x0 .. x3
@@ -390,8 +438,19 @@ __create_page_tables:
 	 */
 	mov	x0, x26				// swapper_pg_dir
 	mov	x5, #PAGE_OFFSET
+#ifdef CONFIG_RELOCATABLE_KERNEL
+	add	x5, x5, x23
+	add	x5, x5, #TEXT_OFFSET
+#endif
 	create_pgd_entry x0, x5, x3, x6
+#ifndef CONFIG_RELOCATABLE_KERNEL
 	ldr	x6, =KERNEL_END			// __va(KERNEL_END)
+#else
+	adrp	x6, KERNEL_END			// runtime __pa(_end)
+	adrp	x3, KERNEL_START			// runtime __pa(_text)
+	sub	x6, x6, x3			// _end - _text
+	add	x6, x6, x5			// runtime __va(_end)
+#endif
 	mov	x3, x24				// phys offset
 	create_block_map x0, x7, x3, x5, x6
 
@@ -553,6 +612,15 @@ ENTRY(set_cpu_boot_mode_flag)
 	ret
 ENDPROC(set_cpu_boot_mode_flag)
 
+#ifdef CONFIG_RELOCATABLE_KERNEL
+	.pushsection	.text
+ENTRY(__boot_kernel_offset)
+	.quad	0     	//Kernel Physical Address
+	.quad	0	//Kernel TEXT_OFFSET
+	.quad 	TEXT_OFFSET
+	.popsection
+#endif
+
 /*
  * We need to find out the CPU boot mode long after boot, so we need to
  * store it in a writable variable.
@@ -591,6 +659,10 @@ ENDPROC(secondary_holding_pen)
 	 */
 ENTRY(secondary_entry)
 	bl	el2_setup			// Drop to EL1
+#ifdef 	CONFIG_RELOCATABLE_KERNEL
+	adr 	x22, __boot_kernel_offset
+	ldp	x24, x19, [x22]
+#endif
 	bl	set_cpu_boot_mode_flag
 	b	secondary_startup
 ENDPROC(secondary_entry)
@@ -599,8 +671,13 @@ ENTRY(secondary_startup)
 	/*
 	 * Common entry point for secondary CPUs.
 	 */
+#ifndef CONFIG_RELOCATABLE_KERNEL
 	adrp	x25, idmap_pg_dir
 	adrp	x26, swapper_pg_dir
+#else
+	adr_l	x25, idmap_pg_dir
+	adr_l	x26, swapper_pg_dir
+#endif
 	bl	__cpu_setup			// initialise processor
 
 	ldr	x21, =secondary_data

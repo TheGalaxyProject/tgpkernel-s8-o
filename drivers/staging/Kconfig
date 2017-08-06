@@ -110,4 +110,8 @@ source "drivers/staging/wilc1000/Kconfig"
 
 source "drivers/staging/most/Kconfig"
 
+source "drivers/staging/samsung/Kconfig"
+
+source "drivers/staging/vnswap/Kconfig"
+
 endif # STAGING

@@ -1138,6 +1138,16 @@ static int is_connected_input_ep(struct snd_soc_dapm_widget *widget,
 			is_connected_input_ep);
 }
 
+int snd_soc_dapm_connected_output_ep(struct snd_soc_dapm_widget *widget)
+{
+	return is_connected_output_ep(widget, NULL);
+}
+
+int snd_soc_dapm_connected_input_ep(struct snd_soc_dapm_widget *widget)
+{
+	return is_connected_input_ep(widget, NULL);
+}
+
 /**
  * snd_soc_dapm_get_connected_widgets - query audio path and it's widgets.
  * @dai: the soc DAI.
@@ -4284,6 +4294,21 @@ void snd_soc_dapm_shutdown(struct snd_soc_card *card)
 		snd_soc_dapm_set_bias_level(&card->dapm,
 					    SND_SOC_BIAS_OFF);
 }
+EXPORT_SYMBOL_GPL(snd_soc_dapm_shutdown);
+
+void snd_soc_dapm_reboot(struct snd_soc_card *card)
+{
+	struct snd_soc_dapm_widget *w;
+
+	mutex_lock(&card->dapm_mutex);
+	list_for_each_entry(w, &card->widgets, list) {
+		dapm_mark_dirty(w, "DAPM reboot");
+	}
+	mutex_unlock(&card->dapm_mutex);
+
+	snd_soc_dapm_sync(&card->dapm);
+}
+EXPORT_SYMBOL_GPL(snd_soc_dapm_reboot);
 
 /* Module information */
 MODULE_AUTHOR("Liam Girdwood, lrg@slimlogic.co.uk");
