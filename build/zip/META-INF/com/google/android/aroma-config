@@ -1,0 +1,136 @@
+# -------------------------------
+# TGPKERNEL AROMA INSTALLER v1.12
+# aroma-config portion
+#
+# Created by djb77 from XDA
+#
+# DO NOT USE ANY PORTION OF THIS
+# CODE WITHOUT MY PERMISSION!!
+# -------------------------------
+
+# ROM INFO
+# --------
+ini_set("force_colorspace","rgba");
+ini_set("rom_name", "TGPKernel");
+ini_set("rom_version", "1.1.0");
+ini_set("rom_author", "djb77");
+ini_set("rom_device", "SM-G93XX");
+ini_set("rom_date", "August 9th, 2017");
+
+# SETUP
+# -----
+writetmpfile("g950x.prop","install=0");
+writetmpfile("g955x.prop","install=0");
+writetmpfile("mtweaks.prop","install=0");
+writetmpfile("busybox.prop","install=0");
+writetmpfile("magisk.prop","install=0");
+writetmpfile("supersu.prop","install=0");
+
+# SET LANGUAGE
+# ------------
+loadlang("langs/en.lang");
+
+# Set Small Font to Support all fonts
+# -----------------------------------
+fontresload( "0", "ttf/Roboto-Regular.ttf;ttf/DroidSansFallback.ttf;", "12" ); #-- Use sets of font (Font Family)
+fontresload( "1", "ttf/Roboto-Regular.ttf;ttf/DroidSansFallback.ttf;", "14" ); #-- Use sets of font (Font Family)
+
+# SET THEME
+# ---------
+theme("materialize_blue-grey");
+
+# SPLASH SCREEN
+# -------------
+splash(3000,"splash");
+
+# CHECK FOR DEVICE VARIANT
+# ------------------------
+restotmp("supersu","supersu");
+restotmp("variant_check","variant_check");
+exec("/tmp/aroma/variant_check","","","");
+
+# INSTALL OPTIONS
+# ---------------
+selectbox(
+	"TGPKERNEL FOR S8 / S8+",
+	"TGPKernel Options",
+	"",
+	"options.prop",
+	"What root do you want?", "", 2,
+	"Magisk / MagiskSU", "", 1,
+	"SuperSU", "", 0,
+	"No Root", "", 0,
+	"Install MTweaks?", "", 2,
+	"Yes", "", 1,
+	"No", "", 0,
+	"Do you want to install Busybox?", "", 2,
+	"Yes", "", 1,
+	"No", "", 0
+);
+if (prop("options.prop","selected.1")=="1") then
+	writetmpfile("magisk.prop","install=1");
+endif;
+if (prop("options.prop","selected.1")=="2") then
+	writetmpfile("supersu.prop","install=1");
+endif;
+if (prop("options.prop","selected.2")=="1") then
+	writetmpfile("mtweaks.prop","install=1");
+endif;
+if (prop("options.prop","selected.3")=="1") then
+	writetmpfile("busybox.prop","install=1");
+endif;
+
+# SUPERSU OPTIONS
+# ---------------
+if (prop("options.prop","selected.1")=="2") then
+	selectbox(
+		"TGPKERNEL FOR S8 / S8+",
+		"SuperSU Encryption Options",
+		"",
+		"su_encrypt.prop",
+		"dm-verity", "", 2,
+		"Auto-detect", "Let SuperSU decide", 1,
+		"Remove", "Disable dm-verity, default", 0,
+		"Keep", "Keep dm-verity enabled. Prevents booting with a modified system partition.", 0,
+		"Force Encrypt", "", 2,
+		"Auto-detect", "Let SuperSU decide", 1,
+		"Remove", "Disable forced encryption of the data partition, default", 0,
+		"Keep", "Keep data encryption force enabled", 0,
+		"Encryptable", "", 2,
+		"Auto-detect", "Let SuperSU decide", 1,
+		"Remove", "Disable encryption of the data partition completely, default on Samsung >= 7.0", 0,
+		"Keep", "Keep optional data encryption enabled, default on all other devices", 0
+	);
+
+	selectbox(
+		"TGPKERNEL FOR S8 / S8+",
+		"SuperSU - Misc Options",
+		"",
+		"su_misc.prop",
+		"Factory reset protection", "", 2,
+		"Auto-detect", "Let SuperSU decide", 1,
+		"Enable", "Allow su binaries (not the GUI) to survive a data wipe. Most devices lack space for this.", 0,
+		"Disable", "Do not survive a data wipe. Default on most devices.", 0,
+		"Bind /system/xbin", "", 2,
+		"Auto-detect", "Let SuperSU decide", 1,
+		"Enable", "Make the su binaries appear in /system/xbin. Compatibility feature required only for outdated root apps.", 0,
+		"Disable", "Normal compatibility, default", 0,
+		"SELinux", "", 2,
+		"Auto-detect", "Let SuperSU decide", 1,
+		"Enforcing",      "Keep SELinux in enforcing mode, patching only the needed rules to allow SuperSU to function, default", 0,
+		"Permissive",     "Set SELinux to permissive mode, disabling its added security", 0
+	);
+endif;
+
+# INSTALL PROCESS
+# --------------
+setvar("retstatus",
+install(
+	"TGPKERNEL FOR S8 / S8+",
+	"",
+	"",
+	"The installation wizard has successfully finished."
+)
+);
+
+
