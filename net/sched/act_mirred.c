@@ -184,7 +184,7 @@ static int tcf_mirred(struct sk_buff *skb, const struct tc_action *a,
                 at = G_TC_AT(skb->tc_verd);
                 if (!(at & AT_EGRESS)) {
                 if (m->tcfm_ok_push)
-                skb_push(skb2, skb->mac_len);
+                skb_push_rcsum(skb2, skb->mac_len);
                 }
 
         /* mirror is always swallowed */
