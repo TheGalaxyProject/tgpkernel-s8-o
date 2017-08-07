@@ -433,7 +433,6 @@ static int ecryptfs_open(struct inode *inode, struct file *file)
 	}
 	ecryptfs_set_file_lower(
 		file, ecryptfs_inode_to_private(inode)->lower_file);
-
 	rc = read_or_initialize_metadata(ecryptfs_dentry);
 #ifdef CONFIG_SDP
 	if (rc) {
