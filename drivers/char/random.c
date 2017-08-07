@@ -949,6 +949,7 @@ void add_interrupt_randomness(int irq, int irq_flags)
 	/* award one bit for the contents of the fast pool */
 	credit_entropy_bits(r, credit + 1);
 }
+EXPORT_SYMBOL_GPL(add_interrupt_randomness);
 
 #ifdef CONFIG_BLOCK
 void add_disk_randomness(struct gendisk *disk)
@@ -1461,12 +1462,16 @@ random_read(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 static ssize_t
 urandom_read(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 {
+	static int maxwarn = 10;
 	int ret;
 
-	if (unlikely(nonblocking_pool.initialized == 0))
-		printk_once(KERN_NOTICE "random: %s urandom read "
-			    "with %d bits of entropy available\n",
-			    current->comm, nonblocking_pool.entropy_total);
+	if (unlikely(nonblocking_pool.initialized == 0) &&
+	    maxwarn > 0) {
+		maxwarn--;
+		printk(KERN_NOTICE "random: %s: uninitialized urandom read "
+		       "(%zd bytes read, %d bits of entropy available)\n",
+		       current->comm, nbytes, nonblocking_pool.entropy_total);
+	}
 
 	nbytes = min_t(size_t, nbytes, INT_MAX >> (ENTROPY_SHIFT + 3));
 	ret = extract_entropy_user(&nonblocking_pool, buf, nbytes);
