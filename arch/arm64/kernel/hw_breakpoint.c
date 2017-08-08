@@ -35,6 +35,7 @@
 #include <asm/traps.h>
 #include <asm/cputype.h>
 #include <asm/system_misc.h>
+#include <asm/uaccess.h>
 
 #ifdef CONFIG_SEC_KWATCHER
 #include <linux/sec_kwatcher.h>
@@ -768,7 +769,7 @@ static int watchpoint_handler(unsigned long addr, unsigned int esr,
 
 		/* Check if the watchpoint value matches. */
 		val = read_wb_reg(AARCH64_DBG_REG_WVR, i);
-		if (val != (addr & ~alignment_mask))
+		if (val != (untagged_addr(addr) & ~alignment_mask))
 			goto unlock;
 
 		/* Possible match, check the byte address select to confirm. */
