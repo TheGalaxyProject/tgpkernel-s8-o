@@ -59,6 +59,10 @@ on post-fs-data
     chmod 0440 /sys/class/dsm/max98506/spk_temp_maxtime
     chown system audio /sys/class/dsm/max98506/spk_temp_overcnt
     chmod 0440 /sys/class/dsm/max98506/spk_temp_overcnt
+    chown system audio /sys/class/dsm/max98506/spk_amp_reg_wrong_cnt
+    chmod 0440 /sys/class/dsm/max98506/spk_amp_reg_wrong_cnt
+    chown system audio /sys/class/dsm/max98506/spk_amp_reg_diff_dump
+    chmod 0440 /sys/class/dsm/max98506/spk_amp_reg_diff_dump
     chown system audio /sys/class/dsm/maxdsm_cal/max
     chown system audio /sys/class/dsm/maxdsm_cal/min
     chown system audio /sys/class/dsm/maxdsm_cal/status
@@ -67,7 +71,10 @@ on post-fs-data
     chown system audio /sys/class/dsm/maxdsm_cal/rdc
     chown system audio /sys/class/dsm/maxdsm_power/duration
     chown system audio /sys/class/dsm/maxdsm_power/interval
-    chown system audio /sys/class/dsm/maxdsm_power/status	
+    chown system audio /sys/class/dsm/maxdsm_power/status
+    chown system audio /sys/class/dsm/maxdsm_cal/v_status
+    chown system audio /sys/class/dsm/maxdsm_cal/v_duration
+    chown system audio /sys/class/dsm/maxdsm_cal/v_validation
     mkdir /data/firmware 0770 audioserver system
     mkdir /efs/maxim 0770 system audio
     chown system audio /efs/maxim/temp_cal
