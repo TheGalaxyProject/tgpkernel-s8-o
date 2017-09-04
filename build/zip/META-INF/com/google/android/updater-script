@@ -35,6 +35,8 @@ then
 	package_extract_file("g955x.img", "/dev/block/platform/11120000.ufs/by-name/BOOT");
 endif;
 
+set_progress(0.35);
+
 # INSTALL SYSTEM PATCHES
 # ----------------------
 ui_print(" ");
@@ -55,7 +57,21 @@ then
 	package_extract_dir("tgpkernel/apps/com.moro.mtweaks-1", "/data/app/com.moro.mtweaks-1");
 endif;
 
-set_progress(0.50);
+set_progress(0.45);
+
+# INSTALL SPECTRUM APP
+# --------------------
+if file_getprop("/tmp/aroma/spectrum.prop","install") == "1"
+then
+	if file_getprop("/tmp/aroma/mtweaks.prop","install") == "0"
+	then
+		ui_print("@Installing Spectrum Control App");
+		delete_recursive("/data/app/org.frap129.spectrum-*");
+		package_extract_dir("tgpkernel/apps/org.frap129.spectrum-1", "/data/app/org.frap129.spectrum-1");
+	endif;
+endif;
+
+set_progress(0.49);
 
 # PERMISSIONS
 # -----------
@@ -65,6 +81,21 @@ set_metadata_recursive("/system/etc/init.d", "uid", 0, "gid", 2000, "dmode", 075
 set_metadata("/system/vendor/lib/libsecure_storage.so", "uid", 0, "gid", 0, "mode", 0644, "capabilities", 0x0, "selabel", "u:object_r:system_file:s0");
 set_metadata("/system/vendor/lib64/libsecure_storage.so", "uid", 0, "gid", 0, "mode", 0644, "capabilities", 0x0, "selabel", "u:object_r:system_file:s0");
 set_metadata_recursive("/system/xbin", "uid", 0, "gid", 2000, "dmode", 0755, "fmode", 0755, "capabilities", 0x0, "selabel", "u:object_r:system_file:s0");
+
+set_progress(0.50);
+
+# RAMDISK PATCHES
+# ---------------
+if file_getprop("/tmp/aroma/patch.prop","install") == "1"
+then
+	ui_print(" ");
+	ui_print("@Patching Ramdisk");
+	package_extract_dir("tgpkernel/anykernel2", "/tmp/ak2");
+	set_perm_recursive(0, 0, 0777, 0777, "/tmp/ak2");
+	run_program("/sbin/busybox", "unzip", "/tmp/ak2/anykernel2.zip", "META-INF/com/google/android/*", "-d", "/tmp/ak2");
+	run_program("/sbin/sh", "/tmp/ak2/META-INF/com/google/android/update-binary", "dummy", "1", "/tmp/ak2/anykernel2.zip");
+	delete_recursive("/tmp/ak2");
+endif;
 
 set_progress(0.60);
 

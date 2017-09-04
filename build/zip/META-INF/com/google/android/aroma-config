@@ -21,8 +21,10 @@ ini_set("rom_date", "August 9th, 2017");
 # -----
 writetmpfile("g950x.prop","install=0");
 writetmpfile("g955x.prop","install=0");
+writetmpfile("patch.prop","install=0");
 writetmpfile("mtweaks.prop","install=0");
 writetmpfile("busybox.prop","install=0");
+writetmpfile("spectrum.prop","install=0");
 writetmpfile("magisk.prop","install=0");
 writetmpfile("supersu.prop","install=0");
 
@@ -49,29 +51,45 @@ restotmp("supersu","supersu");
 restotmp("variant_check","variant_check");
 exec("/tmp/aroma/variant_check","","","");
 
-# INSTALL OPTIONS
+# ROOTING OPTIONS
 # ---------------
 selectbox(
-	"TGPKERNEL FOR S8 / S8+",
-	"TGPKernel Options",
+	"TGPKERNEL FOR S7 / S7 EDGE",
+	"TGPKernel Rooting Options",
 	"",
-	"options.prop",
+	"root.prop",
 	"What root do you want?", "", 2,
 	"Magisk / MagiskSU", "", 1,
 	"SuperSU", "", 0,
-	"No Root", "", 0,
+	"No Root", "", 0
+);
+if (prop("root.prop","selected.1")=="1") then
+	writetmpfile("magisk.prop","install=1");
+endif;
+if (prop("root.prop","selected.1")=="2") then
+	writetmpfile("supersu.prop","install=1");
+endif;
+
+# INSTALL OPTIONS
+# ---------------
+selectbox(
+	"TGPKERNEL FOR S7 / S7 EDGE",
+	"TGPKernel Extra Options",
+	"",
+	"options.prop",
+	"Install the Spectrum Mod + Control App?", "", 2,
+	"Yes", "", 1,
+	"No", "", 0,
 	"Install MTweaks?", "", 2,
 	"Yes", "", 1,
 	"No", "", 0,
 	"Do you want to install Busybox?", "", 2,
-	"Yes", "", 1,
-	"No", "", 0
+	"Yes", "", 0,
+	"No", "", 1
 );
 if (prop("options.prop","selected.1")=="1") then
-	writetmpfile("magisk.prop","install=1");
-endif;
-if (prop("options.prop","selected.1")=="2") then
-	writetmpfile("supersu.prop","install=1");
+	writetmpfile("patch.prop","install=1");
+	writetmpfile("spectrum.prop","install=1");
 endif;
 if (prop("options.prop","selected.2")=="1") then
 	writetmpfile("mtweaks.prop","install=1");
