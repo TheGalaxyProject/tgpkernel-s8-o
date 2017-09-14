@@ -1,5 +1,5 @@
 # -------------------------------
-# TGPKERNEL AROMA INSTALLER v1.12
+# TGPKERNEL AROMA INSTALLER v1.13
 # aroma-config portion
 #
 # Created by djb77 from XDA
@@ -27,6 +27,7 @@ writetmpfile("busybox.prop","install=0");
 writetmpfile("spectrum.prop","install=0");
 writetmpfile("magisk.prop","install=0");
 writetmpfile("supersu.prop","install=0");
+writetmpfile("selinux.prop","install=0");
 
 # SET LANGUAGE
 # ------------
@@ -55,28 +56,34 @@ exec("/tmp/aroma/variant_check","","","");
 # ---------------
 selectbox(
 	"TGPKERNEL FOR S7 / S7 EDGE",
-	"TGPKernel Rooting Options",
+	"TGPKernel Options",
 	"",
-	"root.prop",
+	"options.prop",
 	"What root do you want?", "", 2,
 	"Magisk / MagiskSU", "", 1,
 	"SuperSU", "", 0,
-	"No Root", "", 0
+	"No Root", "", 0,
+	"How do you want SELinux set?", "", 2,
+	"Permissive", "", 1,
+	"Enforcing", "", 0
 );
-if (prop("root.prop","selected.1")=="1") then
+if (prop("options.prop","selected.1")=="1") then
 	writetmpfile("magisk.prop","install=1");
 endif;
-if (prop("root.prop","selected.1")=="2") then
+if (prop("options.prop","selected.1")=="2") then
 	writetmpfile("supersu.prop","install=1");
+endif;
+if (prop("options.prop","selected.2")=="2") then
+	writetmpfile("selinux.prop","install=1");
 endif;
 
 # INSTALL OPTIONS
 # ---------------
 selectbox(
 	"TGPKERNEL FOR S7 / S7 EDGE",
-	"TGPKernel Extra Options",
+	"TGPKernel Options",
 	"",
-	"options.prop",
+	"options2.prop",
 	"Install the Spectrum Mod + Control App?", "", 2,
 	"Yes", "", 1,
 	"No", "", 0,
@@ -87,14 +94,14 @@ selectbox(
 	"Yes", "", 0,
 	"No", "", 1
 );
-if (prop("options.prop","selected.1")=="1") then
+if (prop("options2.prop","selected.1")=="1") then
 	writetmpfile("patch.prop","install=1");
 	writetmpfile("spectrum.prop","install=1");
 endif;
-if (prop("options.prop","selected.2")=="1") then
+if (prop("options2.prop","selected.2")=="1") then
 	writetmpfile("mtweaks.prop","install=1");
 endif;
-if (prop("options.prop","selected.3")=="1") then
+if (prop("options2.prop","selected.3")=="1") then
 	writetmpfile("busybox.prop","install=1");
 endif;
 
@@ -145,10 +152,9 @@ endif;
 setvar("retstatus",
 install(
 	"TGPKERNEL FOR S8 / S8+",
-	"",
+	"Installing, Please Wait...",
 	"",
 	"The installation wizard has successfully finished."
 )
 );
-
 

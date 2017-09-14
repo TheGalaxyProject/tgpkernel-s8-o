@@ -1,5 +1,5 @@
 # -------------------------------
-# TGPKERNEL AROMA INSTALLER v1.12
+# TGPKERNEL AROMA INSTALLER v1.13
 # updater-script portion
 #
 # Created by djb77 from XDA
@@ -18,7 +18,7 @@ ifelse(is_mounted("/data"), unmount("/data"));
 mount("ext4", "EMMC", "/dev/block/platform/11120000.ufs/by-name/SYSTEM", "/system");
 mount("ext4", "EMMC", "/dev/block/platform/11120000.ufs/by-name/USERDATA", "/data");
 
-set_progress(0.30);
+set_progress(0.10);
 
 # FLASH KERNEL
 # ------------
