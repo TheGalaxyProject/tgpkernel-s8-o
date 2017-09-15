@@ -5,9 +5,11 @@
 #
 
 on boot
-    start kernelinit
+    exec u:r:su:s0 root root — /sbin/kernelinit.sh
 
 on property:sys.boot_completed=1
+    exec u:r:su:s0 root root — /sbin/sysinit.sh
+    exec u:r:su:s0 root root — /sbin/wakelock.sh
     start sysinit
     start wakelock
 
