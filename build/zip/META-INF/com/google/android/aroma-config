@@ -12,10 +12,10 @@
 # --------
 ini_set("force_colorspace","rgba");
 ini_set("rom_name", "TGPKernel");
-ini_set("rom_version", "1.1.4");
+ini_set("rom_version", "1.1.5");
 ini_set("rom_author", "djb77");
 ini_set("rom_device", "SM-G93XX");
-ini_set("rom_date", "September 7th, 2017");
+ini_set("rom_date", "September 15th, 2017");
 
 # SETUP
 # -----
