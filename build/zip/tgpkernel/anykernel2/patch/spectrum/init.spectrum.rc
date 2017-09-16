@@ -1,0 +1,79 @@
+# SPECTRUM KERNEL MANAGER
+# Ramdisk file for profile based kernel management
+# Implimentation inspired by Franco's fku profiles
+
+# Initialization
+on property:sys.boot_completed=1
+   # Set default profile on first boot
+   exec u:r:init:s0 root root -- /init.spectrum.sh
+   exec u:r:su:s0 root root -- /init.spectrum.sh
+   # Enable Spectrum support
+   setprop spectrum.support 1
+   # Add kernel name
+   setprop persist.spectrum.kernel TGPKernel
+
+# Balance (default profile)
+on property:persist.spectrum.profile=0
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor interactive
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 455000
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq 1690000
+    write /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor interactive
+    write /sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq 741000
+    write /sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq 2314000
+    write /sys/devices/system/cpu/cpu0/cpufreq/interactive/boost 0
+    write /sys/devices/system/cpu/cpu0/cpufreq/interactive/boost_poolse_duaration 40000
+    write /sys/devices/system/cpu/cpu0/cpufreq/interactive/hispeed_freq 858000
+    write /sys/devices/system/cpu/cpu4/cpufreq/interactive/boost 0
+    write /sys/devices/system/cpu/cpu4/cpufreq/interactive/boost_poolse_duaration 40000
+    write /sys/devices/system/cpu/cpu4/cpufreq/interactive/hispeed_freq 1248000
+    write /dev/cpuset/foreground/cpus 0-2,4-7
+    write /dev/cpuset/foreground/boost/cpus 4-7
+    write /dev/cpuset/top-app/cpus 0-7
+
+# Performance (based on DrunkSauce Lite)
+on property:persist.spectrum.profile=1
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor schedutil
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 832000
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq 1690000
+    write /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor schedutil
+    write /sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq 1170000
+    write /sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq 2314000
+    write /dev/cpuset/foreground/cpus 0-2,4-7
+    write /dev/cpuset/foreground/boost/cpus 4-7
+    write /dev/cpuset/top-app/cpus 0-7
+
+# Battery
+on property:persist.spectrum.profile=2
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor conservative
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 455000
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq 1053000
+    write /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor conservative
+    write /sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq 741000
+    write /sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq 1703000
+    write /sys/devices/system/cpu/cpu0/cpufreq/conservative/down_threshold 20
+    write /sys/devices/system/cpu/cpu0/cpufreq/conservative/freq_step 5
+    write /sys/devices/system/cpu/cpu0/cpufreq/conservative/up_threshold 80
+    write /sys/devices/system/cpu/cpu4/cpufreq/conservative/down_threshold 20
+    write /sys/devices/system/cpu/cpu4/cpufreq/conservative/freq_step 5
+    write /sys/devices/system/cpu/cpu4/cpufreq/conservative/up_threshold 80
+    write /dev/cpuset/foreground/cpus 0-2,4-5
+    write /dev/cpuset/foreground/boost/cpus 4-5
+    write /dev/cpuset/top-app/cpus 0-5
+
+# Gaming
+on property:persist.spectrum.profile=3
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor ondemand
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 1053000
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq 1690000
+    write /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor ondemand
+    write /sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq 1703000
+    write /sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq 2314000
+    write /sys/devices/system/cpu/cpu0/cpufreq/ondemand/sampling_down_factor 1
+    write /sys/devices/system/cpu/cpu0/cpufreq/ondemand/sampling_rate 1000000
+    write /sys/devices/system/cpu/cpu0/cpufreq/ondemand/up_threshold 95
+    write /sys/devices/system/cpu/cpu4/cpufreq/ondemand/sampling_down_factor 1
+    write /sys/devices/system/cpu/cpu4/cpufreq/ondemand/sampling_rate 1000000
+    write /sys/devices/system/cpu/cpu4/cpufreq/ondemand/up_threshold 95
+    write /dev/cpuset/foreground/cpus 0-2,4-7
+    write /dev/cpuset/foreground/boost/cpus 4-7
+    write /dev/cpuset/top-app/cpus 0-7
