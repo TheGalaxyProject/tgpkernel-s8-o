@@ -1,0 +1,69 @@
+img.background=res/background
+img.titlebar=res/titlebar.9
+img.navbar=res/navbar
+img.dialog=res/dialog.9
+img.dialog.titlebar=res/dialog_titlebar.9
+img.progress=res/progress.9
+img.prograss.fill=res/progress_fill.9
+img.selection=res/select
+img.selection.push=res/select
+img.button=res/button.9
+img.button.focus=res/button_primary.9
+img.button.push=res/button_primary_raised.9
+img.checkbox=res/checkbox
+img.checkbox.focus=res/checkbox_focused
+img.checkbox.push=res/checkbox_focused_ripple
+img.checkbox.on=res/checkbox_on
+img.checkbox.on.focus=res/checkbox_on
+img.checkbox.on.push=res/checkbox_on_ripple
+img.radio=res/radio
+img.radio.focus=res/radio_focused
+img.radio.push=res/radio_focused_ripple
+img.radio.on=res/radio_on
+img.radio.on.focus=res/radio_on
+img.radio.on.push=res/radio_on_ripple
+
+
+color.winbg           = #ffffff
+color.winbg_g         = #ffffff
+color.winfg           = #333333
+color.winfg_gray      = #666666
+color.dialogbg        = #ffffff
+color.dialogbg_g      = #ffffff
+color.dialogfg        = #333333
+color.textbg          = #ffffff
+color.textfg          = #333333
+color.textfg_gray     = #666666
+color.controlbg       = #dddddd
+color.controlbg_g     = #cccccc
+color.controlfg       = #333333
+color.selectbg        = #607d8b
+color.selectbg_g      = #607d8b
+color.selectfg        = #ffffff
+color.titlebg         = #607d8b
+color.titlebg_g       = #607d8b
+color.titlefg         = #ffffff
+color.dlgtitlebg      = #607d8b
+color.dlgtitlebg_g    = #607d8b
+color.dlgtitlefg      = #ffffff
+color.scrollbar       = #607d8b
+color.navbg           = #ffffff
+color.navbg_g         = #ffffff
+color.border          = #ffffff
+color.border_g        = #ffffff
+color.progressglow    = #607d8b
+
+
+config.roundsize             = 1
+config.button_roundsize      = 1
+config.window_roundsize      = 1
+config.transition_frame      = 12
+
+
+font.small            = etc/font.small
+font.big              = etc/font.big
+
+
+info.themename        = Materialize
+info.description      = Materialize Theme for AROMA Installer
+info.author           = Humble Potato II
