@@ -93,7 +93,9 @@ mkdir -p $WORKDIR/include
 mkdir -p $WORKDIR/net
 mkdir -p $WORKDIR/ramdisk/ramdisk
 mkdir -p $WORKDIR/ramdisk/ramdisk/config
-chmod 500 $WORKDIR/ramdisk/ramdisk/config
+sudo chmod 500 $WORKDIR/ramdisk/ramdisk/config
+sudo chown 0:0 $WORKDIR/ramdisk/ramdisk 2>/dev/null
+sudo chown 0:0 $WORKDIR/ramdisk/ramdisk/config 2>/dev/null
 mkdir -p $WORKDIR/scripts
 cp -rf $RDIR/arch/arm/ $WORKDIR/arch/
 cp -rf $RDIR/arch/arm64/ $WORKDIR/arch/
@@ -101,16 +103,14 @@ cp -rf $RDIR/arch/x86 $WORKDIR/arch/
 cp -rf $RDIR/firmware $WORKDIR/
 cp -rf $RDIR/include $WORKDIR/
 cp -rf $RDIR/net $WORKDIR/
-cp -rf $RDIR/.build/aik/* $WORKDIR/ramdisk
-cp -rf $RDIR/scripts $WORKDIR/
 if [ $S8 == "1" ]; then
-	cp -rf $RDIR/.build/ramdisk-s8/* $WORKDIR/ramdisk 
+	sudo cp -rf $RDIR/.build/ramdisk-s8/* $WORKDIR/ramdisk 
 fi
 if [ $N8PORT == "1" ]; then
-	cp -rf $RDIR/.build/ramdisk-n8port/* $WORKDIR/ramdisk 
+	sudo cp -rf $RDIR/.build/ramdisk-n8port/* $WORKDIR/ramdisk 
 fi
-sudo chown -R 0:0 $WORKDIR/ramdisk/ramdisk
-sudo chown -R 0:0 $WORKDIR/ramdisk/split_img
+cp -rf $RDIR/.build/aik/* $WORKDIR/ramdisk
+cp -rf $RDIR/scripts $WORKDIR/
 }
 
 # Build zimage Function
