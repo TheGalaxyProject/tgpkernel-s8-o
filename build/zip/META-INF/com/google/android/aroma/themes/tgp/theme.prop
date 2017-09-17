@@ -1,0 +1,68 @@
+img.background=res/background
+img.titlebar=res/titlebar.9
+img.navbar=res/navbar
+img.dialog=res/dialog.9
+img.dialog.titlebar=res/dialog_titlebar.9
+img.progress=res/progress.9
+img.prograss.fill=res/progress_fill.9
+img.selection=res/select
+img.selection.push=res/select
+img.button=res/button.9
+img.button.focus=res/button_primary.9
+img.button.push=res/button_primary_raised.9
+img.checkbox=res/checkbox
+img.checkbox.focus=res/checkbox_focused
+img.checkbox.push=res/checkbox_focused_ripple
+img.checkbox.on=res/checkbox_on
+img.checkbox.on.focus=res/checkbox_on
+img.checkbox.on.push=res/checkbox_on_ripple
+img.radio=res/radio
+img.radio.focus=res/radio_focused
+img.radio.push=res/radio_focused_ripple
+img.radio.on=radio_on
+img.radio.on.focus=radio_on
+img.radio.on.push=radio_on_ripple
+
+
+color.winbg           = #000000
+color.winbg_g         = #000000
+color.winfg           = #cccccc
+color.winfg_gray      = #000000
+color.dialogbg        = #000000
+color.dialogbg_g      = #000000
+color.dialogfg        = #ffffff
+color.textbg          = #000000
+color.textfg          = #ffffff
+color.textfg_gray     = #cccccc
+color.controlbg       = #333333
+color.controlbg_g     = #333333
+color.controlfg       = #cccccc
+color.selectbg        = #444444
+color.selectbg_g      = #222222
+color.selectfg        = #cccccc
+color.titlebg         = #666666
+color.titlebg_g       = #444444
+color.titlefg         = #cccccc
+color.dlgtitlebg      = #444444
+color.dlgtitlebg_g    = #222222
+color.dlgtitlefg      = #cccccc
+color.scrollbar       = #666666
+color.navbg           = #111111
+color.navbg_g         = #000000
+color.border          = #666666
+color.border_g        = #333333
+color.progressglow    = #666666
+
+
+config.roundsize             = 1
+config.button_roundsize      = 1
+config.window_roundsize      = 1
+config.transition_frame      = 5
+
+font.small                   = font.roboto.small
+font.big                     = font.roboto.big
+
+
+info.themename        = tgp
+info.description      = tgp
+info.author           = djb77
