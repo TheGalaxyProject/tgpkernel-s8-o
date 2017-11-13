@@ -49,6 +49,7 @@ int main(void)
   DEFINE(S_X5,			offsetof(struct pt_regs, regs[5]));
   DEFINE(S_X6,			offsetof(struct pt_regs, regs[6]));
   DEFINE(S_X7,			offsetof(struct pt_regs, regs[7]));
+  DEFINE(S_FP,			offsetof(struct pt_regs, regs[29]));
   DEFINE(S_LR,			offsetof(struct pt_regs, regs[30]));
   DEFINE(S_SP,			offsetof(struct pt_regs, sp));
 #ifdef CONFIG_COMPAT

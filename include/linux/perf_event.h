@@ -582,6 +582,9 @@ struct perf_event {
 	int				cgrp_defer_enabled;
 #endif
 
+#ifdef CONFIG_SEC_KWATCHER
+	int used_in_kwatcher;
+#endif
 #endif /* CONFIG_PERF_EVENTS */
 };
 
@@ -988,6 +991,11 @@ extern int perf_cpu_time_max_percent_handler(struct ctl_table *table, int write,
 		void __user *buffer, size_t *lenp,
 		loff_t *ppos);
 
+
+static inline bool perf_paranoid_any(void)
+{
+	return sysctl_perf_event_paranoid > 2;
+}
 
 static inline bool perf_paranoid_tracepoint_raw(void)
 {

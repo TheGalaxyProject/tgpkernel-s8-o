@@ -171,6 +171,23 @@ int inode_init_always(struct super_block *sb, struct inode *inode)
 	mapping_set_gfp_mask(mapping, GFP_HIGHUSER_MOVABLE);
 	mapping->private_data = NULL;
 	mapping->writeback_index = 0;
+#if defined(CONFIG_FMP_ECRYPT_FS) || defined(CONFIG_FMP_EXT4CRYPT_FS)
+	mapping->iv = NULL;
+	memset(mapping->key, 0, KEY_MAX_SIZE);
+	mapping->key_length = 0;
+	mapping->alg = NULL;
+	mapping->sensitive_data_index = 0;
+	mapping->hash_tfm = NULL;
+#ifdef CONFIG_CRYPTO_FIPS
+	mapping->cc_enable = 0;
+#endif
+	mapping->private_enc_mode = 0;
+	mapping->private_algo_mode = 0;
+	mapping->plain_text = 0;
+#endif
+#ifdef CONFIG_SDP
+	mapping->userid = 0;
+#endif
 	inode->i_private = NULL;
 	inode->i_mapping = mapping;
 	INIT_HLIST_HEAD(&inode->i_dentry);	/* buggered by rcu freeing */
@@ -1453,7 +1470,11 @@ static void iput_final(struct inode *inode)
 	else
 		drop = generic_drop_inode(inode);
 
+#if defined(CONFIG_FMP_ECRYPT_FS)
+	if (!drop && (sb->s_flags & MS_ACTIVE) && !inode->i_mapping->use_fmp) {
+#else
 	if (!drop && (sb->s_flags & MS_ACTIVE)) {
+#endif
 		inode->i_state |= I_REFERENCED;
 		inode_add_lru(inode);
 		spin_unlock(&inode->i_lock);

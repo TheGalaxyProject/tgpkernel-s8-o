@@ -80,9 +80,22 @@ static void completion_pages(struct work_struct *work)
 static inline bool ext4_bio_encrypted(struct bio *bio)
 {
 #ifdef CONFIG_EXT4_FS_ENCRYPTION
-	return unlikely(bio->bi_private != NULL);
+#ifdef CONFIG_FMP_EXT4CRYPT_FS
+        struct page *page;
+        int private_enc_mode;
+
+        page = bio->bi_io_vec->bv_page;
+        private_enc_mode = page->mapping->private_enc_mode;
+
+        if (private_enc_mode)
+                return false;
+        else
+                return unlikely(bio->bi_private != NULL);
 #else
-	return false;
+	return unlikely(bio->bi_private != NULL);
+#endif /* CONFIG_FMP_EXT4CRYPT_FS */
+#else
+        return false;
 #endif
 }
 
@@ -277,9 +290,14 @@ int ext4_mpage_readpages(struct address_space *mapping,
 		if (bio == NULL) {
 			struct ext4_crypto_ctx *ctx = NULL;
 
+#ifdef CONFIG_FMP_EXT4CRYPT_FS
+			if (ext4_encrypted_inode(inode) &&
+			    S_ISREG(inode->i_mode) && !inode->i_mapping->private_enc_mode) {
+#else
 			if (ext4_encrypted_inode(inode) &&
 			    S_ISREG(inode->i_mode)) {
-				ctx = ext4_get_crypto_ctx(inode);
+#endif /* CONFIG_FMP_EXT4CRYPT_FS */
+				ctx = ext4_get_crypto_ctx(inode, GFP_NOFS);
 				if (IS_ERR(ctx))
 					goto set_error_page;
 			}

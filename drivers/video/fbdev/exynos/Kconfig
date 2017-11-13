@@ -29,4 +29,8 @@ config EXYNOS_LCD_S6E8AX0
 	  If you have an S6E8AX0 MIPI AMOLED LCD Panel, say Y to enable its
 	  LCD control driver.
 
+if SOC_EXYNOS8895
+source "drivers/video/fbdev/exynos/dpu/Kconfig"
+source "drivers/video/fbdev/exynos/panel/Kconfig"
+endif # SOC_EXYNOS8895
 endif # EXYNOS_VIDEO
