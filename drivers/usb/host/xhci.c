@@ -686,20 +686,22 @@ void xhci_stop(struct usb_hcd *hcd)
 		return;
 #endif
 	mutex_lock(&xhci->mutex);
-	spin_lock_irq(&xhci->lock);
+
 	if (!(xhci->xhc_state & XHCI_STATE_HALTED)) {
+		spin_lock_irq(&xhci->lock);
+
 		xhci->xhc_state |= XHCI_STATE_HALTED;
 		xhci->cmd_ring_state = CMD_RING_STATE_STOPPED;
-
-		/*
-		* Make sure the xHC is halted for a USB3 roothub
-		* (xhci_stop() could be called as part of failed init).
-		*/
 		xhci_halt(xhci);
 		xhci_reset(xhci);
-	}
-	spin_unlock_irq(&xhci->lock);
 
+		spin_unlock_irq(&xhci->lock);
+	}
+
+	if (!usb_hcd_is_primary_hcd(hcd)) {
+		mutex_unlock(&xhci->mutex);
+		return;
+	}
 	xhci_cleanup_msix(xhci);
 
 	/* Deleting Compliance Mode Recovery Timer */
@@ -1571,21 +1573,6 @@ int xhci_urb_dequeue(struct usb_hcd *hcd, struct urb *urb, int status)
 		xhci_urb_free_priv(urb_priv);
 		return ret;
 	}
-#ifndef CONFIG_USB_HOST_SAMSUNG_FEATURE
-	if ((xhci->xhc_state & XHCI_STATE_DYING) ||
-			(xhci->xhc_state & XHCI_STATE_HALTED)) {
-		xhci_dbg_trace(xhci, trace_xhci_dbg_cancel_urb,
-				"Ep 0x%x: URB %p to be canceled on "
-				"non-responsive xHCI host.",
-				urb->ep->desc.bEndpointAddress, urb);
-		/* Let the stop endpoint command watchdog timer (which set this
-		 * state) finish cleaning up the endpoint TD lists.  We must
-		 * have caught it in the middle of dropping a lock and giving
-		 * back an URB.
-		 */
-		goto done;
-	}
-#endif
 
 	ep_index = xhci_get_endpoint_index(&urb->ep->desc);
 	ep = &xhci->devs[urb->dev->slot_id]->eps[ep_index];
