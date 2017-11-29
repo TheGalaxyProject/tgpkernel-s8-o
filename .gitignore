@@ -9,35 +9,9 @@
 #
 # Normal rules
 #
-.*
-*.o
-*.o.*
-*.a
-*.s
-*.ko
-*.so
-*.so.dbg
-*.mod.c
-*.i
-*.lst
-*.symtypes
-*.order
-*.elf
-*.bin
-*.tar
-*.gz
-*.bz2
-*.lzma
-*.xz
-*.lz4
-*.lzo
-*.patch
-*.gcno
-*.ll
-modules.builtin
-Module.symvers
-*.dwo
-*.su
+.output/*
+.work/*
+.work_zip/*
 
 #
 # Top-level generic files
@@ -66,50 +40,7 @@ Module.symvers
 # git files that we don't want to ignore even it they are dot-files
 #
 !.gitignore
-!.mailmap
-
-#
-# Generated include files
-#
-include/config
-include/generated
-arch/*/include/generated
-
-# stgit generated dirs
-patches-*
-
-# quilt's files
-patches
-series
-
-# cscope files
-cscope.*
-ncscope.*
-
-# gnu global files
-GPATH
-GRTAGS
-GSYMS
-GTAGS
-
-# id-utils files
-ID
-
-*.orig
-*~
-\#*#
-
-#
-# Leavings from module signing
-#
-extra_certificates
-signing_key.pem
-signing_key.priv
-signing_key.x509
-x509.genkey
 
 # Kconfig presets
 all.config
 
-# Kdevelop4
-*.kdev4
