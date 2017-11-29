@@ -6164,7 +6164,7 @@ static int rtl8152_rumtime_suspend(struct r8152 *tp)
 		clear_bit(WORK_ENABLE, &tp->flags);
 		usb_kill_urb(tp->intr_urb);
 
-		tp->rtl_ops.autosuspend_en(tp, true);
+		rtl_runtime_suspend_enable(tp, true);
 
 		if (netif_carrier_ok(netdev)) {
 			napi_disable(&tp->napi);
