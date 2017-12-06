@@ -161,7 +161,14 @@ on post-fs-data
 
     chmod 0755 /sys/kernel/debug/tracing
     restorecon /sys/kernel/debug/tracing/trace_marker
-    
+
+# Private Mode
+    mkdir /mnt/shell/privatemode 0700 system system
+    mkdir /storage/Private 0000 system system
+    mkdir /data/privatemode 0770 system system
+    chown system system /data/privatemode
+    restorecon /data/privatemode
+
 on boot
 # SSWAP
     write /proc/sys/vm/swappiness 130
@@ -897,6 +904,7 @@ on property:ro.debuggable=1
 # LPM
 on property:ro.bootmode=charger
     mount ext4 /dev/block/platform/11120000.ufs/by-name/SYSTEM /system wait ro
+    mount f2fs /dev/block/platform/11120000.ufs/by-name/SYSTEM /system wait ro
     wait /dev/block/platform/11120000.ufs/by-name/EFS
     mount ext4 /dev/block/platform/11120000.ufs/by-name/EFS /efs nosuid nodev noatime noauto_da_alloc,discard,journal_checksum,data=ordered,errors=panic
     class_start sec-charger
