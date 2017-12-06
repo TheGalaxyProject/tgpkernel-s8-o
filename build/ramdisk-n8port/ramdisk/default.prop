@@ -7,8 +7,9 @@ ro.secure=1
 security.perf_harden=1
 ro.adb.secure=1
 ro.allow.mock.location=0
-ro.debuggable=0
-persist.sys.usb.config=mtp
+ro.debuggable=1
+persist.sys.usb.config=mtp,adb
+persist.service.adb.enable=1
 ro.zygote=zygote64_32
 ro.sf.lcd_density=420
 ro.sf.init.lcd_density=560
@@ -33,6 +34,11 @@ dalvik.vm.usejit=true
 dalvik.vm.usejitprofiles=true
 dalvik.vm.appimageformat=lz4
 debug.atrace.tags.enableflags=0
+
+wlan.wfd.hdcp=disable
+ro.securestorage.support=false
+persist.adb.notify=0
+
 #
 # BOOTIMAGE_BUILD_PROPERTIES
 #
