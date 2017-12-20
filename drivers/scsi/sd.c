@@ -240,11 +240,15 @@ manage_start_stop_store(struct device *dev, struct device_attribute *attr,
 {
 	struct scsi_disk *sdkp = to_scsi_disk(dev);
 	struct scsi_device *sdp = sdkp->device;
+	bool v;
 
 	if (!capable(CAP_SYS_ADMIN))
 		return -EACCES;
 
-	sdp->manage_start_stop = simple_strtoul(buf, NULL, 10);
+	if (kstrtobool(buf, &v))
+		return -EINVAL;
+
+	sdp->manage_start_stop = v;
 
 	return count;
 }
@@ -262,6 +266,7 @@ static ssize_t
 allow_restart_store(struct device *dev, struct device_attribute *attr,
 		    const char *buf, size_t count)
 {
+	bool v;
 	struct scsi_disk *sdkp = to_scsi_disk(dev);
 	struct scsi_device *sdp = sdkp->device;
 
@@ -271,7 +276,10 @@ allow_restart_store(struct device *dev, struct device_attribute *attr,
 	if (sdp->type != TYPE_DISK)
 		return -EINVAL;
 
-	sdp->allow_restart = simple_strtoul(buf, NULL, 10);
+	if (kstrtobool(buf, &v))
+		return -EINVAL;
+
+	sdp->allow_restart = v;
 
 	return count;
 }
