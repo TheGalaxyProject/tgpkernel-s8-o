@@ -30,6 +30,7 @@
 #include "compatibility.h"
 
 /* Version Information */
+#define NET_VERSION		"3"
 #define DRIVER_VERSION "v2.08.0 (2016/12/09)"
 #define DRIVER_AUTHOR "Realtek nic sw <nic_swsd@realtek.com>"
 #define DRIVER_DESC "Realtek RTL8152/RTL8153 Based USB Ethernet Adapters"
@@ -2249,8 +2250,6 @@ static void _rtl8152_set_rx_mode(struct net_device *netdev)
 	u32 mc_filter[2];	/* Multicast hash filter */
 	__le32 tmp[2];
 	u32 ocp_data;
-
-	clear_bit(RTL8152_SET_RX_MODE, &tp->flags);
 
 	if (!netif_carrier_ok(netdev))
 		return;
@@ -5598,7 +5597,7 @@ static inline void __rtl_work_func(struct r8152 *tp)
 	if (test_and_clear_bit(RTL8152_LINK_CHG, &tp->flags))
 		set_carrier(tp);
 
-	if (test_bit(RTL8152_SET_RX_MODE, &tp->flags))
+	if (test_and_clear_bit(RTL8152_SET_RX_MODE, &tp->flags))
 		_rtl8152_set_rx_mode(tp->netdev);
 
 	/* don't schedule napi before linking */
@@ -5703,6 +5702,8 @@ static int rtk_disable_diag(struct r8152 *tp)
 
 	return 0;
 }
+
+
 
 static int rtl8152_open(struct net_device *netdev)
 {
@@ -6483,6 +6484,10 @@ int rtl8152_get_settings(struct net_device *netdev, struct ethtool_cmd *cmd)
 	mutex_unlock(&tp->control);
 
 	usb_autopm_put_interface(tp->intf);
+#ifdef CONFIG_PM_SLEEP
+	tp->pm_notifier.notifier_call = rtl_notifier;
+	register_pm_notifier(&tp->pm_notifier);
+#endif
 
 out:
 	return ret;
