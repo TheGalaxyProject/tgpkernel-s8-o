@@ -134,7 +134,7 @@ struct f2fs_dir_entry *find_target_dentry(struct fscrypt_name *fname,
 		    fscrypt_match_name(fname, d->filename[bit_pos],
 				       le16_to_cpu(de->name_len)))
 			goto found;
-
+not_match:
 		if (max_slots && max_len > *max_slots)
 			*max_slots = max_len;
 		max_len = 0;
