@@ -548,7 +548,6 @@ static int __test_aead(struct crypto_aead *tfm, int enc,
 
 		memcpy(input, template[i].input, template[i].ilen);
 		memcpy(assoc, template[i].assoc, template[i].alen);
-
 		if (template[i].iv)
 			memcpy(iv, template[i].iv, iv_len);
 		else
