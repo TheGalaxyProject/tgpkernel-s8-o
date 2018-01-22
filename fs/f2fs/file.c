@@ -1906,9 +1906,6 @@ static int f2fs_ioc_set_encryption_policy(struct file *filp, unsigned long arg)
 	struct inode *inode = file_inode(filp);
 	int err;
 
-	if (!f2fs_sb_has_crypto(inode->i_sb))
-		return -EOPNOTSUPP;
-
 	f2fs_update_time(F2FS_I_SB(inode), REQ_TIME);
 
 	return fscrypt_ioctl_set_policy(filp, (const void __user *)arg);
