@@ -405,3 +405,5 @@ config CLTCP
 	---help---
 	This feature implements Cross Layer TCP (CLTCP)
 
+config HAVE_EBPF_JIT
+	bool
