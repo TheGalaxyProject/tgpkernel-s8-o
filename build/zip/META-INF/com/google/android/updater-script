@@ -1,0 +1,362 @@
+# -------------------------------
+# TGPKERNEL INSTALLER 5.0.2
+# updater-script portion
+#
+# DO NOT USE ANY PORTION OF THIS
+# CODE WITHOUT MY PERMISSION!!
+# -------------------------------
+
+set_progress(0.0);
+
+ui_print("@Setting up");
+
+# UNPACK FILES
+# ------------
+ui_print("- Unpacking Files");
+package_extract_dir("tgpkernel/files", "/tmp/tgptemp");
+run_program("/tmp/aroma/tgpkernel.sh", "setup_extract");
+
+set_progress(0.20);
+
+# MOUNT PARTITIONS
+# ----------------
+ui_print("- Mounting Partitions");
+if is_mounted("/system") == "/system" then
+	assert(run_program("/sbin/busybox", "umount", "/system"));
+endif;
+if is_mounted("/data") == "/data" then
+	assert(run_program("/sbin/busybox", "umount", "/data"));
+endif;
+run_program("/sbin/mount", "/system");
+run_program("/sbin/mount", "/data");
+
+set_progress(0.25);
+
+# CHECK ROM
+# ---------
+run_program("/tmp/aroma/tgpkernel.sh", "rom_check");
+if file_getprop("/tmp/aroma/check_s8.prop","install") == "1"
+then
+	ui_print("- Checking for ROM Type, S8 Found");
+endif;
+if file_getprop("/tmp/aroma/check_n8port.prop","install") == "1"
+then
+	ui_print("- Checking for ROM Type, N8 Port Found");
+endif;
+if file_getprop("/tmp/aroma/check_s8oreo.prop","install") == "1"
+then
+	ui_print("- Checking for ROM Type, S8 Oreo Found");
+endif;
+if file_getprop("/tmp/aroma/check_s9port.prop","install") == "1"
+then
+	ui_print("- Checking for ROM Type, S9 Port Found");
+endif;
+
+# BACKUP CONFIG
+# -------------
+if file_getprop("/tmp/aroma/tgpkernel-backup.prop","install") == "1"
+then
+	ui_print("- Backing up Config");
+	run_program("/tmp/aroma/tgpkernel.sh", "config_backup");
+endif;
+
+# RESTORE CONFIG
+# --------------
+if file_getprop("/tmp/aroma/tgpkernel-restore.prop","install") == "1"
+then
+	ui_print("- Restoring Config");
+	run_program("/tmp/aroma/tgpkernel.sh", "config_restore");
+endif;
+
+# WIPE MAGISK / SUPERSU
+# ---------------------
+if file_getprop("/tmp/aroma/wipe.prop","install") == "1"
+then
+	ui_print("- Clearing old Magisk / SuperSU Installs");
+	run_program("/tmp/aroma/tgpkernel.sh", "wipe_magisk_supersu");
+endif;
+
+set_progress(0.30);
+ui_print(" ");
+
+# FLASH KERNEL
+# ------------
+if file_getprop("/tmp/aroma/g950x.prop","install") == "1"
+then
+	if file_getprop("/tmp/aroma/check_s8.prop","install") == "1"
+	then
+		ui_print("@Flashing TGPKernel for S8");
+	endif;
+	if file_getprop("/tmp/aroma/check_n8port.prop","install") == "1"
+	then
+		ui_print("@Flashing TGPKernel for S8 (N8 Port)");
+	endif;
+	if file_getprop("/tmp/aroma/check_s8oreo.prop","install") == "1"
+	then
+		ui_print("@Flashing TGPKernel for S8 (Oreo)");
+	endif;
+	if file_getprop("/tmp/aroma/check_s9port.prop","install") == "1"
+	then
+		ui_print("@Flashing TGPKernel for S8 (S9 Port)");
+	endif;
+endif;
+if file_getprop("/tmp/aroma/g955x.prop","install") == "1"
+then
+	if file_getprop("/tmp/aroma/check_s8.prop","install") == "1"
+	then
+		ui_print("@Flashing TGPKernel for S8+");
+	endif;
+	if file_getprop("/tmp/aroma/check_n8port.prop","install") == "1"
+	then
+		ui_print("@Flashing TGPKernel for S8+ (N8 Port)");
+	endif;
+	if file_getprop("/tmp/aroma/check_s8oreo.prop","install") == "1"
+	then
+		ui_print("@Flashing TGPKernel for S8+ (Oreo)");
+	endif;
+	if file_getprop("/tmp/aroma/check_s9port.prop","install") == "1"
+	then
+		ui_print("@Flashing TGPKernel for S8+ (S9 Port)");
+	endif;
+endif;
+run_program("/tmp/aroma/tgpkernel.sh", "kernel_patch");
+if file_getprop("/tmp/aroma/flashready.prop","install") == "0"
+then
+	ui_print(" ");
+	ui_print("@      !! ERROR !!");
+	ui_print(" ");
+	ui_print("@   KERNEL DID NOT PATCH PROPERLY");
+	ui_print("@   ABORTING INSTALLER. ");
+endif;
+if file_getprop("/tmp/aroma/flashready.prop","install") == "1"
+then
+	run_program("/tmp/aroma/tgpkernel.sh", "kernel_flash");
+
+	set_progress(0.35);
+
+# INSTALL SYSTEM PATCHES
+# ----------------------
+	ui_print("@Patching System");
+	if file_getprop("/tmp/aroma/insecureadb.prop","install") == "1"
+	then
+		package_extract_dir("tgpkernel/adb", "/system/xbin");
+	endif;
+	run_program("/tmp/aroma/tgpkernel.sh", "system_patch");
+	delete_recursive("/tmp/tgptemp");
+
+	set_progress(0.40);
+
+# SPLASH SCREEN
+# -------------
+	if file_getprop("/tmp/aroma/splash.prop","install") == "1"
+	then
+		if file_getprop("/tmp/aroma/g950x.prop","install") == "1"
+		then
+			if file_getprop("/tmp/aroma/check_s8.prop","install") == "1"
+			then
+				ui_print("@Installing Custom Splash Screen for S8");
+				package_extract_dir("tgpkernel/splash/s8", "/tmp/splash");
+				run_program("/tmp/aroma/tgpkernel.sh", "splash_flash");	
+			endif;
+			if file_getprop("/tmp/aroma/check_s8oreo.prop","install") == "1"
+			then
+				ui_print("@Installing Custom Splash Screen for S8");
+				package_extract_dir("tgpkernel/splash/s8", "/tmp/splash");
+				run_program("/tmp/aroma/tgpkernel.sh", "splash_flash");	
+			endif;
+			if file_getprop("/tmp/aroma/check_n8port.prop","install") == "1"
+			then
+				ui_print("@Installing Custom Splash Screen for Note 8");
+				package_extract_dir("tgpkernel/splash/n8", "/tmp/splash");
+				run_program("/tmp/aroma/tgpkernel.sh", "splash_flash");		
+			endif;
+			if file_getprop("/tmp/aroma/check_s9port.prop","install") == "1"
+			then
+				ui_print("@Installing Custom Splash Screen for S9 Port");
+				package_extract_dir("tgpkernel/splash/s9", "/tmp/splash");
+				run_program("/tmp/aroma/tgpkernel.sh", "splash_flash");		
+			endif;
+		endif;
+		if file_getprop("/tmp/aroma/g955x.prop","install") == "1"
+		then
+			if file_getprop("/tmp/aroma/check_s8.prop","install") == "1"
+			then
+				ui_print("@Installing Custom Splash Screen for S8+");
+				package_extract_dir("tgpkernel/splash/s8+", "/tmp/splash");
+				run_program("/tmp/aroma/tgpkernel.sh", "splash_flash");
+			endif;
+			if file_getprop("/tmp/aroma/check_s8oreo.prop","install") == "1"
+			then
+				ui_print("@Installing Custom Splash Screen for S8+");
+				package_extract_dir("tgpkernel/splash/s8+", "/tmp/splash");
+				run_program("/tmp/aroma/tgpkernel.sh", "splash_flash");
+			endif;
+			if file_getprop("/tmp/aroma/check_n8port.prop","install") == "1"
+			then
+				ui_print("@Installing Custom Splash Screen for Note 8");
+				package_extract_dir("tgpkernel/splash/n8+", "/tmp/splash");
+				run_program("/tmp/aroma/tgpkernel.sh", "splash_flash");	
+			endif;
+			if file_getprop("/tmp/aroma/check_s9port.prop","install") == "1"
+			then
+				ui_print("@Installing Custom Splash Screen for S9 Port");
+				package_extract_dir("tgpkernel/splash/s9+", "/tmp/splash");
+				run_program("/tmp/aroma/tgpkernel.sh", "splash_flash");	
+			endif;
+		endif;
+	endif;
+
+	set_progress(0.42);
+
+# INSTALL MTWEAKS
+# ---------------
+	if file_getprop("/tmp/aroma/mtweaks.prop","install") == "1"
+	then
+		ui_print("@Installing MTweaks App");
+		delete_recursive("/system/app/com.moro.mtweaks*");
+		delete_recursive("/system/priv-app/com.moro.mtweaks*");
+		delete_recursive("/data/app/com.moro.mtweaks*");
+		delete_recursive("/data/data/com.moro.mtweaks*");
+		package_extract_dir("tgpkernel/apps/com.moro.mtweaks-1", "/data/app/com.moro.mtweaks-1");
+	endif;
+
+	set_progress(0.44);
+
+# INSTALL WIREGUARD
+# -----------------
+	if file_getprop("/tmp/aroma/wireguard.prop","install") == "1"
+	then
+		ui_print("@Installing WireGuard Control App");
+		delete_recursive("/data/app/com.wireguard.android*");
+		delete_recursive("/data/data/com.wireguard.android*");
+		package_extract_dir("tgpkernel/apps/com.wireguard.android-1", "/data/app/com.wireguard.android-1");
+	endif;
+
+	set_progress(0.46);
+
+# INSTALL SPECTRUM APP
+# --------------------
+	if file_getprop("/tmp/aroma/spectrum.prop","install") == "1"
+	then
+		ui_print("@Installing Spectrum Control App");
+		delete("/data/property/persist.spectrum.profile");
+		delete_recursive("/data/app/org.frap129.spectrum*");
+		delete_recursive("/data/data/org.frap129.spectrum*");
+		package_extract_dir("tgpkernel/apps/org.frap129.spectrum-1", "/data/app/org.frap129.spectrum-1");
+	endif;
+
+	set_progress(0.48);
+
+# INSTALL BUSYBOX
+# ---------------
+	if file_getprop("/tmp/aroma/busybox.prop","install") == "1"
+	then
+		ui_print("@Installing Busybox");
+		run_program("/tmp/aroma/tgpkernel.sh", "busybox");
+	endif;
+
+	set_progress(0.50);
+
+# INSTALL ADB
+# -----------
+	if file_getprop("/tmp/aroma/adb.prop","install") == "1"
+	then
+		ui_print("@Installing ADB");
+		package_extract_dir("tgpkernel/adb", "/tmp/adb");
+		run_program("/tmp/aroma/tgpkernel.sh", "adb");
+	endif;
+
+	set_progress(0.52);
+	
+# PERMISSIONS
+# -----------
+	ui_print("@Setting System Permissions");
+	set_metadata_recursive("/system/etc/init.d", "uid", 0, "gid", 2000, "dmode", 0755, "fmode", 0755, "capabilities", 0x0, "selabel", "u:object_r:system_file:s0");
+	set_metadata("/system/vendor/lib/libsecure_storage.so", "uid", 0, "gid", 0, "mode", 0644, "capabilities", 0x0, "selabel", "u:object_r:system_file:s0");
+	set_metadata("/system/vendor/lib64/libsecure_storage.so", "uid", 0, "gid", 0, "mode", 0644, "capabilities", 0x0, "selabel", "u:object_r:system_file:s0");
+	set_metadata_recursive("/system/xbin", "uid", 0, "gid", 2000, "dmode", 0755, "fmode", 0755, "capabilities", 0x0, "selabel", "u:object_r:system_file:s0");
+
+	set_progress(0.55);
+
+# RAMDISK PATCHES
+# ---------------
+	ui_print(" ");
+	ui_print("@Patching Ramdisk");
+	ui_print("- Extracting AnyKernel");
+	package_extract_dir("tgpkernel/anykernel2", "/tmp/ak2");
+	set_perm_recursive(0, 0, 0777, 0777, "/tmp/ak2");
+	run_program("/sbin/busybox", "unzip", "/tmp/ak2/anykernel2.zip", "META-INF/com/google/android/*", "-d", "/tmp/ak2");
+	run_program("/sbin/sh", "/tmp/ak2/META-INF/com/google/android/update-binary", "dummy", "1", "/tmp/ak2/anykernel2.zip");
+	delete_recursive("/tmp/ak2");
+	delete_recursive("/tmp/anykernel*");
+
+	set_progress(0.60);
+
+# INSTALL SUPERSU
+# ---------------
+	if file_getprop("/tmp/aroma/supersu.prop","install") == "1"
+	then
+		ui_print(" ");
+		ui_print("@Installing SuperSU");
+		ui_print("- Extracting SuperSU");
+		run_program("/tmp/aroma/tgpkernel.sh", "supersu");
+		if file_getprop("/tmp/aroma/check_s8oreo.prop","install") == "0"
+		then
+			package_extract_dir("tgpkernel/supersu", "/tmp/supersu");
+		endif;
+		if file_getprop("/tmp/aroma/check_s8oreo.prop","install") == "1"
+		then
+			package_extract_dir("tgpkernel/supersu-o", "/tmp/supersu");
+		endif;
+		package_extract_dir("tgpkernel/suhide", "/data/media/0");
+		set_perm_recursive(0, 0, 0777, 0777, "/tmp/supersu");
+		run_program("/sbin/busybox", "unzip", "/tmp/supersu/supersu.zip", "META-INF/com/google/android/*", "-d", "/tmp/supersu");
+		run_program("/sbin/sh", "/tmp/supersu/META-INF/com/google/android/update-binary", "dummy", "1", "/tmp/supersu/supersu.zip");
+		delete_recursive("/tmp/supersu");
+	endif;
+
+set_progress(0.70);
+
+# INSTALL MAGISK
+# --------------
+	if file_getprop("/tmp/aroma/magisk.prop","install") == "1"
+	then
+		ui_print(" ");
+		ui_print("@Installing Magisk");
+		ui_print("- Extracting Magisk");
+		if file_getprop("/tmp/aroma/check_s8oreo.prop","install") == "1"
+		then
+			package_extract_dir("tgpkernel/safetynet", "/data/media/0");
+		endif;
+		package_extract_dir("tgpkernel/magisk", "/tmp/magisk");
+		set_perm_recursive(0, 0, 0777, 0777, "/tmp/magisk");
+		run_program("/sbin/busybox", "unzip", "/tmp/magisk/magisk.zip", "META-INF/com/google/android/*", "-d", "/tmp/magisk");
+		run_program("/sbin/sh", "/tmp/magisk/META-INF/com/google/android/update-binary", "dummy", "1", "/tmp/magisk/magisk.zip");
+		delete_recursive("/tmp/magisk");
+	endif;
+
+	set_progress(0.80);
+
+endif;
+
+set_progress(0.95);
+
+# FINISH
+# ------
+ui_print(" ");
+ui_print("@Unmounting Partitions");
+if is_mounted("/system") == "/system" then
+	assert(run_program("/sbin/busybox", "umount", "/system"));
+endif;
+if is_mounted("/system") == "/cache" then
+	assert(run_program("/sbin/busybox", "umount", "/cache"));
+endif;
+if is_mounted("/data") == "/data" then
+	assert(run_program("/sbin/busybox", "umount", "/data"));
+endif;
+
+ui_print(" ");
+ui_print("@Installation Complete");
+
+set_progress(1);
+

@@ -1,0 +1,251 @@
+# -------------------------------
+# TGPKERNEL INSTALLER 5.0.2
+# aroma-config portion
+#
+# Created by djb77 from XDA
+#
+# DO NOT USE ANY PORTION OF THIS
+# CODE WITHOUT MY PERMISSION!!
+# -------------------------------
+
+# ROM INFO
+# --------
+ini_set("force_colorspace","rgba");
+ini_set("rom_name", "TGPKernel");
+ini_set("rom_version", "");
+ini_set("rom_author", "djb77");
+ini_set("rom_device", "SM-G95XX");
+ini_set("rom_date", "");
+
+# SETUP
+# -----
+writetmpfile("adb.prop","install=0");
+writetmpfile("backup.prop","install=0");
+writetmpfile("busybox.prop","install=0");
+writetmpfile("check_s8.prop","install=0");
+writetmpfile("check_s8oreo.prop","install=0");
+writetmpfile("check_n8port.prop","install=0");
+writetmpfile("check_s9port.prop","install=0");
+writetmpfile("flashready.prop","install=0");
+writetmpfile("g950x.prop","install=0");
+writetmpfile("g955x.prop","install=0");
+writetmpfile("insecureadb.prop","install=0");
+writetmpfile("magisk.prop","install=0");
+writetmpfile("mtweaks.prop","install=0");
+writetmpfile("selinux.prop","install=0");
+writetmpfile("spectrum.prop","install=0");
+writetmpfile("spectrumprofile.prop","install=0");
+writetmpfile("splash.prop","install=0");
+writetmpfile("supersu.prop","install=0");
+writetmpfile("tgpkernel-backup.prop","install=0");
+writetmpfile("tgpkernel-restore.prop","install=0");
+writetmpfile("wipe.prop","install=0");
+writetmpfile("wireguard.prop","install=0");
+
+# SET LANGUAGE
+# ------------
+loadlang("langs/en.lang");
+
+# Set Small Font to Support all fonts
+# -----------------------------------
+fontresload( "0", "ttf/Roboto-Regular.ttf;ttf/DroidSansFallback.ttf;", "12" ); #-- Use sets of font (Font Family)
+fontresload( "1", "ttf/Roboto-Regular.ttf;ttf/DroidSansFallback.ttf;", "14" ); #-- Use sets of font (Font Family)
+
+# SET THEME
+# ---------
+theme("materialize_blue-grey");
+
+# SPLASH SCREEN
+# -------------
+splash(3000,"splash");
+
+# COPY FILES TO /TMP/AROMA
+# ------------------------
+restotmp("scripts/bspatch","bspatch");
+restotmp("scripts/busybox","busybox");
+restotmp("scripts/tar","tar");
+restotmp("scripts/tgpkernel.sh","tgpkernel.sh");
+
+# SET PERMISSIONS AND CHECK FOR CONFIG BACKUP
+# -------------------------------------------
+exec("/tmp/aroma/tgpkernel.sh","setup","","");
+if (prop("backup.prop","install")=="1") then
+	setvar(
+	"backup_text",
+	"<b>CONFIGURATION BACKUP FOUND</b>\n\n"+
+	"The installer has located a saved configuration in the TGPKernel folder on your Internal Memory.\n\n"+
+	"You will now be given an option to use this configuration and proceed straight to the installer, "+
+	"skipping all the installation selection screens.\n\n"+
+	"Press the <b>Next</b> button, then select <b>Yes</b> or <b>No</b> on the Popup Dialog Box."+
+	""
+	);
+	textbox(
+	"TGPKERNEL FOR S8 / S8+",
+	" ",
+	"@deafult",
+	getvar("backup_text")
+	);
+	if
+		confirm(
+		"TGPKERNEL FOR S8 / S8+",
+		"Would you like to use your current saved configuration?",
+		"@default"
+		)=="yes"
+	then
+		writetmpfile("tgpkernel-restore.prop","install=1");
+	else
+		writetmpfile("tgpkernel-restore.prop","install=0");
+	endif;
+endif;
+
+if (prop("tgpkernel-restore.prop","install")=="0") then
+
+# INSTALL OPTIONS
+# ---------------
+	selectbox(
+		"TGPKERNEL FOR S8 / S8+",
+		"TGPKernel Options",
+		"",
+		"tgp.prop",
+		"Backup your settings?", "", 2,
+		"Yes", "", 0,
+		"No", "", 1,
+		"What root do you want?", "", 2,
+		"Magisk", "", 1,
+		"SuperSU", "", 0,
+		"SuperSU / Magisk", "", 0,
+		"No Root", "", 0,
+		"Wipe old Magisk / SuperSU Installs?", "", 2,
+		"Yes", "", 0,
+		"No", "", 1
+	);
+	if (prop("tgp.prop","selected.1")=="1") then
+		writetmpfile("tgpkernel-backup.prop","install=1");
+	endif;
+	if (prop("tgp.prop","selected.2")=="1") then
+		writetmpfile("magisk.prop","install=1");
+	endif;
+	if (prop("tgp.prop","selected.2")=="2") then
+		writetmpfile("supersu.prop","install=1");
+	endif;
+	if (prop("tgp.prop","selected.2")=="3") then
+		writetmpfile("supersu.prop","install=1");
+		writetmpfile("magisk.prop","install=1");
+	endif;
+	if (prop("tgp.prop","selected.3")=="1") then
+		writetmpfile("wipe.prop","install=1");
+	endif;
+
+# SUPERSU OPTIONS
+# ---------------
+	if (prop("tgp.prop","selected.2")=="2") then
+		selectbox(
+			"TGPKERNEL FOR S8 / S8+",
+			"SuperSU installation type. For SUHide to work you need to use Systemless SBIN.",
+			"",
+			"install.prop",
+			"Auto-detect", "Let SuperSU decide", 0,
+			"System", "Force system installation, default on Android < 6.0", 0,
+			"Systemless Image", "Force systemless installation in image mode, default on Android 6.x and 7.x", 0,
+			"Systemless SBIN", "Force systemless installation in SBIN mode, default on Android >= 8.x", 1
+		);
+		selectbox(
+			"TGPKERNEL FOR S8 / S8+",
+			"SuperSU Encryption Options",
+			"",
+			"su_encrypt.prop",
+			"dm-verity", "", 2,
+			"Auto-detect", "Let SuperSU decide", 1,
+			"Remove", "Disable dm-verity, default", 0,
+			"Keep", "Keep dm-verity enabled. Prevents booting with a modified system partition.", 0,
+			"Force Encrypt", "", 2,
+			"Auto-detect", "Let SuperSU decide", 1,
+			"Remove", "Disable forced encryption of the data partition, default", 0,
+			"Keep", "Keep data encryption force enabled", 0,
+			"Encryptable", "", 2,
+			"Auto-detect", "Let SuperSU decide", 1,
+			"Remove", "Disable encryption of the data partition completely, default on Samsung >= 7.0", 0,
+			"Keep", "Keep optional data encryption enabled, default on all other devices", 0
+		);
+		selectbox(
+			"TGPKERNEL FOR S8 / S8+",
+			"SuperSU - Misc Options",
+			"",
+			"su_misc.prop",
+			"Factory reset protection", "", 2,
+			"Auto-detect", "Let SuperSU decide", 1,
+			"Enable", "Allow su binaries (not the GUI) to survive a data wipe. Most devices lack space for this.", 0,
+			"Disable", "Do not survive a data wipe. Default on most devices.", 0,
+			"Bind /system/xbin", "", 2,
+			"Auto-detect", "Let SuperSU decide", 1,
+			"Enable", "Make the su binaries appear in /system/xbin. Compatibility feature required only for outdated root apps.", 0,
+			"Disable", "Normal compatibility, default", 0,
+			"SELinux", "", 2,
+			"Auto-detect", "Let SuperSU decide", 1,
+			"Enforcing", "Keep SELinux in enforcing mode, patching only the needed rules to allow SuperSU to function, default", 0,
+			"Permissive", "Set SELinux to permissive mode, disabling its added security", 0
+		);
+	endif;
+
+# MAIN OPTIONS - INSTALL APPS
+# ---------------------------
+	checkbox(
+		"TGPKERNEL FOR S8 / S8+",
+		"Main Options",
+		"",
+		"main.prop",
+		"Install Apps", "", 2,
+		"Install MTweaks", "", 0,
+		"Install WireGuard", "", 0,
+		"Install Busybox", "", 0,
+		"Install ADB", "", 0
+	);
+	if (prop("main.prop","item.1.1")=="1") then
+		writetmpfile("mtweaks.prop","install=1");
+	endif;
+	if (prop("main.prop","item.1.2")=="1") then
+		writetmpfile("wireguard.prop","install=1");
+	endif;
+	if (prop("main.prop","item.1.3")=="1") then
+		writetmpfile("busybox.prop","install=1");
+	endif;
+	if (prop("main.prop","item.1.4")=="1") then
+		writetmpfile("adb.prop","install=1");
+	endif;
+
+# MAIN OPTIONS - KERNEL OPTIONS
+# -----------------------------
+	checkbox(
+		"TGPKERNEL FOR S8 / S8+",
+		"Main Options",
+		"",
+		"main2.prop",
+		"Kernel Options", "", 2,
+		"Install Spectrum", "", 0,
+		"Set Kernel to Enforcing", "", 0,
+		"Install Custom Splash Screen", "", 0
+	);
+	if (prop("main2.prop","item.1.1")=="1") then
+		writetmpfile("spectrum.prop","install=1");
+	endif;
+	if (prop("main2.prop","item.1.2")=="1") then
+		writetmpfile("selinux.prop","install=1");
+	endif;
+	if (prop("main2.prop","item.1.3")=="1") then
+		writetmpfile("splash.prop","install=1");
+	endif;
+
+endif;
+
+# INSTALL PROCESS
+# --------------
+setvar("retstatus",
+install(
+	"TGPKERNEL FOR S8 / S8+",
+	"Installing, Please Wait... This may take a while...",
+	"",
+	"The installation wizard has successfully finished."
+)
+);
+
+
