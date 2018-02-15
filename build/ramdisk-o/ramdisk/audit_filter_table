@@ -77,7 +77,7 @@ auditfilter hal_power_default sysfs_battery:file { read write };
 auditfilter hal_sensors_default system_data_file:dir write;
 auditfilter hal_wifi_supplicant_default hal_wifi_supplicant_default:capability { dac_override dac_read_search };
 auditfilter healthd healthd:capability2 wake_alarm;
-auditfilter idmap dalvikcache_data_file:file write;
+auditfilter idmap dalvikcache_data_file:file { read write execute };
 auditfilter init proc:dir write;
 auditfilter init qti-testscripts:process transition;
 auditfilter init sysfs_devices_system_cpu:dir write;
@@ -201,7 +201,7 @@ auditfilter system_app apk_data_file:file { create write unlink }; comm="id.app.
 auditfilter system_app bluetooth:unix_stream_socket ioctl;
 auditfilter system_app config_gz:dir getattr;
 auditfilter system_app crash_dump:dir search;
-auditfilter system_app dalvikcache_data_file:file write;
+auditfilter system_app dalvikcache_data_file:file { read write execute };
 auditfilter system_app efs_file:file getattr;
 auditfilter system_app input_device:chr_file { read write };
 auditfilter system_app installd_service:service_manager find;

@@ -291,7 +291,6 @@
 /data/clipboard/knox(/.*)?		u:object_r:knox_clipboard_file:s0
 /dev/socket/msockets(/.*)?		u:object_r:msockets_socket:s0
 /data/security/spota(/.*)?		u:object_r:security_spota_file:s0
-/dev/\.secure_storage(/.*)?		u:object_r:secure_storage_device:s0
 /sys/class/backlight(/.*)?		--	u:object_r:sysfs_ss_writable:s0
 /sys/class/leds/led_[1-4](/.*)?		--	u:object_r:sysfs_led_writable:s0
 /dev/block/platform/.+/by-name/SBFS		u:object_r:sbfs_block_device:s0
@@ -382,7 +381,6 @@
 /sys/class/devfreq/bus_mif.7/time_in_state_raw		u:object_r:sysfs_time_in_state:s0
 /system/python/lwshield/run.pyc		u:object_r:python_exec:s0
 /sys/kernel/debug/frontswap(/.*)?		u:object_r:sec_debugfs:s0
-/data/system/secure_storage(/.*)?		u:object_r:secure_storage_data_file:s0
 /sys/class/devfreq/17000010.bus_int/time_in_state_raw		u:object_r:sysfs_time_in_state:s0
 /sys/class/devfreq/17000020.bus_mif/time_in_state_raw		u:object_r:sysfs_time_in_state:s0
 /data/data/com\.android\.shell(/.*)?		u:object_r:shell_data_file:s0
@@ -818,7 +816,6 @@
 /system/bin/debug_interface_proxy		u:object_r:debug_interface_proxy_exec:s0
 /sys/class/misc/multipdp/waketime		u:object_r:sysfs_ss_writable:s0
 /sbin/dm_verity_signature_checker		u:object_r:dm_verity_signature_checker_exec:s0
-/system/bin/secure_storage_daemon		u:object_r:secure_storage_exec:s0
 /system/bin/samsungpowersoundplay		u:object_r:samsungpowersoundplay_exec:s0
 /vendor/lib64/hw/vulkan\.exynos5\.so		u:object_r:vendor_file:s0
 /sys/class/mst/mst_ftmdrv/transmit		u:object_r:sysfs_mst_writable:s0

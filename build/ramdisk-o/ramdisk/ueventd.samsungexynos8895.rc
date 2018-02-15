@@ -153,6 +153,8 @@
 /sys/devices/system/cpu/cpu*	cpufreq/interactive/input_boost			0660	system	system
 /sys/devices/system/cpu/cpu*	cpufreq/interactive/boostpulse_duration		0660	system	system
 /sys/devices/system/cpu/cpu*	cpufreq/interactive/io_is_busy			0660	system	system
+/sys/devices/system/cpu/cpu*	cpufreq/interactive/param_index			0660	system	system
+/sys/devices/system/cpu/cpu*	cpufreq/interactive/mode			0660	system	system
 
 # Vision (VPU, SCORE)
 /dev/vertex0             0660   media      media
