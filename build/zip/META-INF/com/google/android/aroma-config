@@ -1,0 +1,209 @@
+# -------------------------
+# TGPKERNEL INSTALLER 5.5.7
+# Created by @djb77
+# -------------------------
+
+# ROM INFO
+# --------
+ini_set("force_colorspace","rgba");
+ini_set("rom_name", "TGPKernel");
+ini_set("rom_version", "");
+ini_set("rom_author", "djb77");
+ini_set("rom_device", "SM-G95XX");
+ini_set("rom_date", "");
+
+# SETUP
+# -----
+writetmpfile("adb.prop","install=0");
+writetmpfile("anykernel.prop","install=0");
+writetmpfile("backup.prop","install=0");
+writetmpfile("busybox.prop","install=0");
+writetmpfile("check_s8.prop","install=0");
+writetmpfile("check_n8port.prop","install=0");
+writetmpfile("check_s9port.prop","install=0");
+writetmpfile("deodexed.prop","install=0");
+writetmpfile("g950x.prop","install=0");
+writetmpfile("g955x.prop","install=0");
+writetmpfile("insecureadb.prop","install=0");
+writetmpfile("magisk.prop","install=0");
+writetmpfile("mtweaks.prop","install=0");
+writetmpfile("selinux.prop","install=0");
+writetmpfile("spectrum.prop","install=0");
+writetmpfile("splash.prop","install=0");
+writetmpfile("tgpkernel-backup.prop","install=0");
+writetmpfile("tgpkernel-restore.prop","install=0");
+writetmpfile("wipe.prop","install=0");
+writetmpfile("wireguard.prop","install=0");
+
+# SET LANGUAGE
+# ------------
+loadlang("langs/en.lang");
+
+# FONT AND THEME SELETION
+# -----------------------
+fontresload( "0", "ttf/Roboto-Regular.ttf;ttf/DroidSansArabic.ttf;ttf/DroidSansFallback.ttf;", "12" ); #-- Use sets of font (Font Family)
+theme("tgp");
+
+# SET LANGUAGE & FONT FAMILY
+# --------------------------
+loadlang("langs/en.lang");
+fontresload( "0", "ttf/Roboto-Regular.ttf", "12" ); #-- "0" = Small Font ( Look at Fonts & UNICODE Demo Below )
+fontresload( "1", "ttf/Roboto-Regular.ttf", "18" ); #-- "1" = Big Font
+
+# SPLASH SCREEN
+# -------------
+splash(3000,"splash");
+
+# INSTALLER SETUP
+# ---------------
+restotmp("files/adb","adb");
+restotmp("files/adb.bin","adb.bin");
+restotmp("files/fastboot","fastboot");
+restotmp("files/busybox","busybox");
+restotmp("files/tar","tar");
+restotmp("files/tgpkernel.sh","tgpkernel.sh");
+exec("/tmp/aroma/tgpkernel.sh","setup","","");
+exec("/tmp/aroma/tgpkernel.sh","variant_check","","");
+
+# CHECK FOR CONFIG BACKUP
+# -----------------------
+exec("/tmp/aroma/tgpkernel.sh","config_check","","");
+if (prop("backup.prop","install")=="1") then
+	setvar(
+	"backup_text",
+	"<b><#99ccff>CONFIGURATION BACKUP FOUND</#></b>\n\n"+
+	"<#99cccc>The installer has located a saved configuration in the TGP folder on your Internal Memory.\n\n"+
+	"You will now be given an option to use this configuration and proceed straight to the installer, "+
+	"skipping all the installation selection screens.\n\n"+
+	"Press the </#><b>Next</b> <#99cccc>button, then select </#><b>Yes</b> <#99cccc>or</#> <b>No</b> <#99cccc>on the Popup Dialog Box.</#>"
+	);
+	textbox(
+	"<#ffffff>TGPKERNEL FOR S8 / S8+</#>",
+	" ",
+	"@deafult",
+	getvar("backup_text")
+	);
+	if
+		confirm(
+		"<#ffffff>TGPKERNEL FOR S8 / S8+</#>",
+		"Would you like to use your current saved configuration?",
+		"@default"
+		)=="yes"
+	then
+		writetmpfile("tgpkernel-restore.prop","install=1");
+	else
+		writetmpfile("tgpkernel-restore.prop","install=0");
+	endif;
+endif;
+
+if (prop("tgpkernel-restore.prop","install")=="0") then
+
+# INSTALL OPTIONS
+# ---------------
+	selectbox(
+		"<#ffffff>TGPKERNEL FOR S8 / S8+</#>",
+		"<#99ccff>        Please select from the following options</#>",
+		"",
+		"tgp.prop",
+		"<#ffffcc>Backup your settings</#>", "", 2,
+		"Yes", "", 0,
+		"No", "", 1,
+		"<#ffffcc>Root selection</#>", "", 2,
+		"Magisk - Clean Install", "", 0,
+		"Magisk", "", 1,
+		"No Root", "", 0,
+		"<#ffffcc>Splash Screen Options</#>", "", 2,
+		"Install TGPKernel Splash Screen", "", 0,
+		"Install Stock Splash Screen", "", 0,
+		"Keep Current Splash Screen", "", 1
+	);
+	if (prop("tgp.prop","selected.1")=="1") then
+		writetmpfile("tgpkernel-backup.prop","install=1");
+	endif;
+	if (prop("tgp.prop","selected.2")=="1") then
+		writetmpfile("wipe.prop","install=1");
+		writetmpfile("magisk.prop","install=1");
+	endif;
+	if (prop("tgp.prop","selected.2")=="2") then
+		writetmpfile("magisk.prop","install=1");
+	endif;
+	if (prop("tgp.prop","selected.3")=="1") then
+		writetmpfile("splash.prop","install=2");
+	endif;
+	if (prop("tgp.prop","selected.3")=="2") then
+		writetmpfile("splash.prop","install=1");
+	endif;
+
+# MAIN OPTIONS - INSTALL APPS
+# ---------------------------
+	checkbox(
+		"<#ffffff>TGPKERNEL FOR S8 / S8+</#>",
+		"<#99ccff>        Please select from the following options</#>",
+		"",
+		"main.prop",
+		"<#ffffcc>Install Apps</#>", "", 2,
+		"Install MTweaks", "", 0,
+		"Install WireGuard", "", 0,
+		"Install Busybox", "", 0,
+		"Install ADB", "", 0
+	);
+	if (prop("main.prop","item.1.1")=="1") then
+		writetmpfile("mtweaks.prop","install=1");
+	endif;
+	if (prop("main.prop","item.1.2")=="1") then
+		writetmpfile("wireguard.prop","install=1");
+	endif;
+	if (prop("main.prop","item.1.3")=="1") then
+		writetmpfile("busybox.prop","install=1");
+	endif;
+	if (prop("main.prop","item.1.4")=="1") then
+		writetmpfile("adb.prop","install=1");
+	endif;
+
+# MAIN OPTIONS - KERNEL OPTIONS
+# -----------------------------
+	checkbox(
+		"<#ffffff>TGPKERNEL FOR S8 / S8+</#>",
+		"<#99ccff>        Please select from the following options</#>",
+		"",
+		"main2.prop",
+		"<#ffffcc>Kernel Options</#>", "", 2,
+		"Install Spectrum", "", 0,
+		"Set Kernel to Enforcing", "", 0
+	);
+	if (prop("main2.prop","item.1.1")=="1") then
+		writetmpfile("anykernel.prop","install=1");
+		writetmpfile("spectrum.prop","install=1");
+	endif;
+	if (prop("main2.prop","item.1.2")=="1") then
+		writetmpfile("anykernel.prop","install=1");
+		writetmpfile("selinux.prop","install=1");
+	endif;
+
+endif;
+
+# START INSTALLER
+# ---------------
+ini_set("text_next", "Install");
+ini_set("icon_next", "@installbutton");
+viewbox(
+	"<#ffffff>TGPKERNEL FOR S8 / S8+</#>",
+	"TGPKernel is ready to be installed.\n\n"+
+	"Press the Install button to begin the installation.\n\n"+
+	"To review or change any of your settings, press the Back button.",
+	""
+);
+
+# INSTALL PROCESS
+# --------------
+ini_set("text_next", "Finish");
+ini_set("icon_next", "@finish");
+setvar("retstatus",
+install(
+	"<#ffffff>TGPKERNEL FOR S8 / S8+</#>",
+	"<#99ccff>            The Kernel is now being installed</#>",
+	"",
+	"<#99ccff>            The Kernel has now been installed</#>"
+)
+);
+
