@@ -42,7 +42,7 @@ on post-fs-data
 
     # for WIFI MEMDUMP
     # The default value of below memdump file is set in SecProductFeature
-    # write /data/misc/conn/.memdump.info 2
+    write /data/misc/conn/.memdump.info 2
     chown system root /data/misc/conn/.memdump.info
     chmod 0666 /data/misc/conn/.memdump.info
 
@@ -64,7 +64,7 @@ on post-fs-data
     # for WIFI hotspot
     write /data/misc/conn/.softap.info 0
     chown system root /data/misc/conn/.softap.info
-    chmod 0640 /data/misc/conn/.softap.info
+    chmod 0660 /data/misc/conn/.softap.info
 
     # for fwpath
     chmod 0666 /sys/module/wlan/parameters/fwpath

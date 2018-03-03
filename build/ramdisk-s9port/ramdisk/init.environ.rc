@@ -11,4 +11,4 @@ on init
     export SYSTEMSERVERCLASSPATH /system/framework/services.jar:/system/framework/ethernet-service.jar:/system/framework/wifi-service.jar:/system/framework/samsung-services.jar:/system/framework/hqm.jar:/system/framework/dmf.jar:/system/framework/ssrm.jar
     
     
-    
+    export LD_PRELOAD libTcpOptimizer.so
