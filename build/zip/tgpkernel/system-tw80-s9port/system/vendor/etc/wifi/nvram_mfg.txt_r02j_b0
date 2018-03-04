@@ -1,0 +1,325 @@
+# BCM4361B0 SWB-E32 R02 nvram_170213 FW13_35_53 For DREAM1_EU
+
+NVRAMRev=$Rev: 506283 $
+
+sromrev=11
+boardrev=0x1101
+boardtype=0x0837
+
+#boardnum=57410 
+macaddr=00:90:4c:12:d0:01
+ccode=0
+regrev=0
+antswitch=0
+
+vendid=0x14e4
+devid=0x441f
+manfid=0x2d0
+
+# Board Flag setting
+boardflags=0x10401201
+boardflags2=0x00000000
+boardflags3=0x40002100
+btldopu=1
+
+# ---- TWO range TSSI ----
+slice/1/tworangetssi2g=1
+tworangetssi2g=0
+tworangetssi5g=0
+
+# Low Power Range calibration .. enable
+slice/1/lowpowerrange2g=0
+
+# Power detector parameter
+AvVmid_c0=4,137,2,150,2,150,2,150,2,150
+AvVmid_c1=4,136,2,150,2,150,2,150,2,150
+slice/1/AvVmid_c0=2,160,4,110,4,110,4,110,4,110
+slice/1/AvVmid_c1=2,160,4,110,4,110,4,110,4,110
+
+## SPMSK setting parameters
+cckdigfilttype=2
+fdss_level_5g=-1,-1
+fdss_interp_en=0
+slice/1/fdss_level_2g=5,5
+slice/1/fdss_interp_en=1
+
+## HW Related Parameters
+#prodid=0x052e
+nocrc=1
+
+xtalfreq=37400
+rxgains2gelnagaina0=4
+rxgains2gtrisoa0=7
+rxgains2gtrelnabypa0=1
+rxgains5gelnagaina0=3
+rxgains5gtrisoa0=6
+rxgains5gtrelnabypa0=1
+rxgains5gmelnagaina0=3
+rxgains5gmtrisoa0=6
+rxgains5gmtrelnabypa0=1
+rxgains5ghelnagaina0=3
+rxgains5ghtrisoa0=6
+rxgains5ghtrelnabypa0=1
+rxgains2gelnagaina1=4
+rxgains2gtrisoa1=7
+rxgains2gtrelnabypa1=1
+rxgains5gelnagaina1=3
+rxgains5gtrisoa1=6
+rxgains5gtrelnabypa1=1
+rxgains5gmelnagaina1=3
+rxgains5gmtrisoa1=6
+rxgains5gmtrelnabypa1=1
+rxgains5ghelnagaina1=3
+rxgains5ghtrisoa1=6
+rxgains5ghtrelnabypa1=1
+rxchain=3
+txchain=3
+bandcap=2
+slice/1/bandcap=1
+aa2g=3
+aa5g=3
+agbg0=0
+agbg1=0
+aga0=0
+aga1=0
+tssipos2g=1
+extpagain2g=0
+tssipos5g=1
+extpagain5g=0
+slice/1/extpagain2g=2
+slice/1/extpagain5g=0
+pdgain5g=0
+pdgain2g=0
+
+# Main core RF SW Map
+swctrlmap_2g=0x00000000,0x00000000,0x00000000,0x000000,0x000
+swctrlmapext_2g=0x00000000,0x00000000,0x00000000,0x000000,0x000
+swctrlmap_5g=0xa0182018,0xa0080000,0x20080000,0x000000,0x0000
+swctrlmapext_5g=0x01010100,0x00010000,0x00000000,0x000000,0x0000 
+
+# Aux core RF SW Map
+slice/1/swctrlmap_2g=0x08020802,0x48020000,0x40000000,0x000000,0x000
+slice/1/swctrlmapext_2g=0x00000000,0x00020000,0x00020000,0x000000,0x000
+slice/1/swctrlmap_5g=0x00000000,0x00000000,0x00000000,0x000000,0x000
+slice/1/swctrlmapext_5g=0x00000000,0x00000000,0x00000000,0x000000,0x000 
+
+# Main & Aux priority set
+clb2gslice0core0=0x000
+clb2gslice1core0=0x202
+clb5gslice0core0=0x118
+clb5gslice1core0=0x000
+clb2gslice0core1=0x000
+clb2gslice1core1=0x048
+clb5gslice0core1=0x1a0
+clb5gslice1core1=0x000
+
+## SEMCO PA Tuned Parameters_FW13.35.42_1.25dB Up
+slice/1/pa2ga0=0xff4b,0x1ad2,0xfcc9
+slice/1/pa2ga1=0xff4c,0x1b7b,0xfcb8
+slice/1/pa2ga2=0xff2c,0x129b,0xfd8f
+slice/1/pa2ga3=0xff1f,0x1153,0xfdbc
+
+## SEMCO PA Tuned Parameters_FW13.35.35_0.5dB_Up
+pa5ga0=0xff15,0x17aa,0xfcfa,0xff19,0x18bd,0xfcd7,0xff16,0x1838,0xfce9,0xff17,0x185c,0xfce6
+pa5ga1=0xff17,0x186e,0xfce1,0xff17,0x182e,0xfcea,0xff1a,0x1906,0xfcd1,0xff1a,0x18b4,0xfcda
+
+# Target max Power
+maxp2ga0=83
+maxp2ga1=83
+maxp5ga0=78,76,76,78
+maxp5ga1=79,77,79,78
+subband5gver=0x4
+paparambwver=3
+## Target power & offset parameters
+slice/1/cckpwroffset0=2
+slice/1/cckpwroffset1=1
+pdoffset40ma0=0x0000
+pdoffset80ma0=0x0000
+pdoffset40ma1=0x0000
+pdoffset80ma1=0x0000
+cckbw202gpo=0x0011
+cckbw20ul2gpo=0
+mcsbw202gpo=0x99755555
+mcsbw402gpo=0x99777777
+dot11agofdmhrbw202gpo=0x7755
+ofdmlrbw202gpo=0x0033
+mcsbw205glpo=0x55330000
+mcsbw405glpo=0xAAA88884
+mcsbw805glpo=0xEEECCCC6
+mcsbw1605glpo=0
+mcsbw205gmpo=0x55330000
+mcsbw405gmpo=0xAAA88884
+mcsbw805gmpo=0xEEECCCC6
+mcsbw1605gmpo=0
+mcsbw205ghpo=0x55330000
+mcsbw405ghpo=0xAAA88884
+mcsbw805ghpo=0xEEECCCC6
+mcsbw1605ghpo=0
+mcslr5glpo=0x0000
+mcslr5gmpo=0x0000
+mcslr5ghpo=0x0000
+sb20in40hrpo=0x0
+sb20in80and160hr5glpo=0x0
+sb40and80hr5glpo=0x0
+sb20in80and160hr5gmpo=0x0
+sb40and80hr5gmpo=0x0
+sb20in80and160hr5ghpo=0x0
+sb40and80hr5ghpo=0x0
+sb20in40lrpo=0x0
+sb20in80and160lr5glpo=0x0
+sb40and80lr5glpo=0x0
+sb20in80and160lr5gmpo=0x0
+sb40and80lr5gmpo=0x0
+sb20in80and160lr5ghpo=0x0
+sb40and80lr5ghpo=0x0
+dot11agduphrpo=0x0
+dot11agduplrpo=0x0
+mcs1024qam2gpo=0xCCCC
+mcs1024qam5glpo=0xEECCCC
+mcs1024qam5gmpo=0xEECCCC
+mcs1024qam5ghpo=0xEECCCC
+mcs1024qam5gx1po=0xEECCCC
+mcs1024qam5gx2po=0xEECCCC
+mcs8poexp=0
+mcs9poexp=0
+mcs10poexp=0
+mcs11poexp=0
+
+# Temperature based calibration related params
+phycal_tempdelta=15
+slice/1/phycal_tempdelta=15
+temps_period=15
+temps_hysteresis=15
+tempthresh=255
+tempoffset=255
+rawtempsense=0x1ff
+
+## LTE Coex. Parameters
+ltecxmux=0
+ltecxpadnum=0x0904
+ltecxfnsel=0x44
+ltecxgcigpio=0x04
+
+# ###########  BTC Dynctl profile params  ############
+# flags:bit0 - dynctl enabled, bit1 dynamic desense, bit2 dynamic mode
+btcdyn_flags=0x7
+btcdyn_dflt_dsns_level=0
+btcdyn_low_dsns_level=0
+btcdyn_mid_dsns_level=7
+btcdyn_high_dsns_level=2
+btcdyn_default_btc_mode=1
+btcdyn_btrssi_hyster=2
+# --- number of rows in the array vars below ---
+btcdyn_msw_rows=3
+btcdyn_dsns_rows=2
+# --- mode switch data rows (max is 4) ---
+btcdyn_msw_row0=1,8,0,-50,-100
+btcdyn_msw_row1=1,4,0,-55,-100
+btcdyn_msw_row2=1,0,0,-70,-100
+#btcdyn_msw_row3=1,-4,0,-70,-100
+# --- desense switching data rows (max is 4) ---
+#btcdyn_dsns_row0=5,8,0,-40,-40
+btcdyn_dsns_row0=5,4,0,-60,-60
+btcdyn_dsns_row1=5,0,0,0,-75
+clb_swctrl_smask_ant0=0x3ff
+clb_swctrl_smask_ant1=0x1ff
+btc_prisel_ant_mask=0x1
+btc_mode=1
+# --- Internal Cal related params ----
+# 0:NBPAPD 1:WBPAPD
+txwbpapden=0
+# NB PAPD Cal params
+slice/1/nb_eps_offset=468,468
+slice/1/nb_bbmult=68,68
+slice/1/nb_papdcalidx=4,4
+slice/1/nb_txattn=2,2
+slice/1/nb_rxattn=1,1
+slice/1/nb_eps_stopidx=63
+
+# energy detect threshold
+ed_thresh2g=-63
+ed_thresh5g=-63
+# energy detect threshold for EU
+eu_edthresh2g=-63
+eu_edthresh5g=-63
+# RSSI Compensation parameters
+rssicorrnorm_c0=7,7
+rssicorrnorm_c1=7,7
+rssicorrnorm5g_c0=5,5,5,5,5,5,5,5,5,5,5,5
+rssicorrnorm5g_c1=5,5,5,5,5,5,5,5,5,5,5,5
+
+## 2G CH compensation Parameters
+slice/1/powoffs2gtna0=-1,0,0,1,1,-1,-1,-1,-2,-2,-2,-1,-3,0
+slice/1/powoffs2gtna1=-2,-2,-1,-1,0,0,1,1,-1,-1,-1,-2,-2,0
+
+## Imp_TXBF calibration parameters
+rpcal2g=252
+rpcal5gb0=126
+rpcal5gb1=125
+rpcal5gb2=129
+rpcal5gb3=160
+slice/1/rpcal2g=252
+slice/1/rpcal5gb0=126
+slice/1/rpcal5gb1=125
+slice/1/rpcal5gb2=129
+slice/1/rpcal5gb3=160
+
+# 5G power offset per channel for band edge channel
+powoffs5g20mtna0=0,0,0,0,0,0,0
+powoffs5g20mtna1=0,0,0,0,0,0,0
+powoffs5g40mtna0=0,0,0,0,0
+powoffs5g40mtna1=0,0,0,0,0
+powoffs5g80mtna0=0,0,0,0,0
+powoffs5g80mtna1=0,0,0,0,0
+
+# ###########  Configuration for Software Features ############
+## --- SAR power back off ---
+slice/1/dynamicsarctrl_2g=0xbcbc
+dynamicsarctrl_5g=0xb4b4
+slice/1/dynamicsarctrl_2g_2=0xbcbc
+dynamicsarctrl_5g_2=0xb4b4
+
+## RSDB SAR Limits
+## SAR Enable ON
+rsdb_dynamicsarctrl_5g=0xb4b4
+rsdb_dynamicsarctrl_5g_2=0xb4b4
+slice/1/rsdb_dynamicsarctrl_2g=0xb4b4
+slice/1/rsdb_dynamicsarctrl_2g_2=0xb4b4
+## SAR Enable OFF
+rsdb_dynamicsarctrl_5g_1=0xc6c6
+slice/1/rsdb_dynamicsarctrl_2g_1=0xc6c6
+
+
+## --- CH12 CH13 Power Limit ---
+slice/1/fccpwrch12=10
+slice/1/fccpwrch13=1
+slice/1/fccpwroverride=0
+
+
+
+## --- RX Temperature Throttling parameter ---
+#throttle_thresh=50
+
+## --- PCIE interface Parameters ---
+# --- GPIO number of device wake interrupt ---
+#device_wake_opt=1
+# --- GPIO number of host wake interrupt ---
+host_wake_opt=0
+
+## --- UART configuration, host wake interrupt for SDIO interface ---
+# [13:8]- Select GCI pair for using GCI UART
+# [7:4] - GPIO number of host wake interrupt for SDIO interface
+# [3:0] - Select GPIO pair for using UART
+muxenab=0x000103
+
+
+## --- GPIO number of SensorHub Interworking Interrupt ---
+#shwakepin=0x58
+
+## --- 11b ANT selection Diversity ---
+cck_onecore_tx=1
+#slice/1/ocl=0
+
+## --- 11b ANT selection Diversity core mask setting ---
+#ocl_cm=2
+#slice/1/ocl_cm=2
