@@ -25,6 +25,7 @@
 #include <linux/debugfs.h>
 #include <linux/serial_core.h>
 #include <linux/sysfs.h>
+#include <linux/cmdline_helper.h>
 
 #include <asm/setup.h>  /* for COMMAND_LINE_SIZE */
 #include <asm/page.h>
@@ -994,6 +995,10 @@ int __init early_init_dt_scan_chosen(unsigned long node, const char *uname,
 	/* Retrieve command line unless forcing */
 	if (read_dt_cmdline)
 		p = of_get_flat_dt_prop(node, "bootargs", &l);
+
+	p = add_cmdline(p, "androidboot.verifiedbootstate=green");
+	p = add_cmdline(p, "androidboot.fmp_config=1");
+	p = add_cmdline(p, "androidboot.warranty_bit=0");
 
 	if (p != NULL && l > 0) {
 		if (concat_cmdline) {
