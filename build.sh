@@ -71,12 +71,12 @@ exit
 }
 
 # Check command line for switches
-[ $1 = "0" ] && OPTION_CLEAN_ALL
-[ $1 = "00" ] && OPTION_CCACHE
-if [ $1 = "keep" ] || [ $2 = "keep" ]; then
+[ "$1" = "0" ] && OPTION_CLEAN_ALL
+[ "$1" = "00" ] && OPTION_CCACHE
+if [ "$1" = "keep" ] || [ "$2" = "keep" ]; then
 KEEP=yes
 fi
-if [ $1 = "silent" ] || [ $2 = "silent" ]; then
+if [ "$1" = "silent" ] || [ "$2" = "silent" ]; then
 SILENT=yes
 fi
 
