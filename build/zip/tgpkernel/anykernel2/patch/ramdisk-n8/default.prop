@@ -1,0 +1,46 @@
+#
+# ADDITIONAL_DEFAULT_PROPERTIES
+#
+persist.security.ams.enforcing=0
+ro.oem_unlock_supported=1
+ro.secure=1
+security.perf_harden=1
+ro.adb.secure=1
+ro.allow.mock.location=0
+ro.debuggable=0
+persist.sys.usb.config=mtp,adb
+persist.service.adb.enable=1
+ro.zygote=zygote64_32
+ro.telephony.default_network=9
+ro.supportmodel.mptcp=0
+ro.radio.noril=no
+ro.telephony.default_cdma_sub=0
+dalvik.vm.image-dex2oat-Xms=64m
+dalvik.vm.image-dex2oat-Xmx=64m
+dalvik.vm.dex2oat-Xms=64m
+dalvik.vm.dex2oat-Xmx=512m
+ro.dalvik.vm.native.bridge=0
+dalvik.vm.usejit=true
+dalvik.vm.usejitprofiles=true
+dalvik.vm.dexopt.secondary=true
+dalvik.vm.appimageformat=lz4
+pm.dexopt.first-boot=quicken
+pm.dexopt.boot=verify
+pm.dexopt.install=quicken
+pm.dexopt.bg-dexopt=speed-profile
+pm.dexopt.ab-ota=speed-profile
+debug.atrace.tags.enableflags=0
+
+ro.securestorage.support=false
+ro.boottime.secure_storage=false
+ro.security.vaultkeeper.feature=0
+ro.sec.fle.encryption=false
+ro.config.knox=v30
+wlan.wfd.hdcp=disable
+
+#
+# BOOTIMAGE_BUILD_PROPERTIES
+#
+ro.bootimage.build.date=Mon Jan 21 15:52:18 KST 2019
+ro.bootimage.build.date.utc=1548053538
+ro.bootimage.build.fingerprint=samsung/greatltexx/greatlte:8.0.0/R16NW/N950FXXS5CSA6:user/test-keys
