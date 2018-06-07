@@ -719,8 +719,11 @@ on fs
     chown system system /sys/class/sensors/hrm_sensor/hrm_debug
     chown system system /sys/class/sensors/hrm_sensor/write_reg
     chown system system /sys/class/sensors/hrm_sensor/read_reg
+    chown system system /sys/class/sensors/hrm_sensor/osc_trim
     chmod 0600 /dev/max_hrm
     chown system system /dev/max_hrm
+    chown system system /efs/FactoryApp/hrm_osc_trim
+    chmod 0644 /efs/FactoryApp/hrm_osc_trim
 
 # Grip_sensor
     chown system radio /sys/class/sensors/grip_sensor/name

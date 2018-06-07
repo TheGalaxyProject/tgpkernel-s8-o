@@ -72,6 +72,7 @@ user=system seinfo=platform name=com.android.sec.backup.svc domain=blocked_app t
 user=_app seinfo=platform name=com.android.data.backup domain=blocked_app type=app_data_file
 user=_app seinfo=platform name=com.android.sec.backup.svc domain=blocked_app type=app_data_file
 user=_app seinfo=platform name=com.samsung.android.lxd domain=lxd_app type=app_data_file
+user=_app seinfo=release name=com.samsung.android.lxd domain=lxd_app type=app_data_file
 user=_app seinfo=attiqi name=com.att.iqi domain=attiqi_app type=attiqi_app_data_file
 user=oem_5500 domain=felica_app type=app_data_file levelFrom=user
 user=oem_5501 domain=felica_app type=app_data_file levelFrom=user
