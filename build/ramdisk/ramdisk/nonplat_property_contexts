@@ -77,6 +77,8 @@ ro.product.brand                 u:object_r:csc_prop:s0
 ro.security.                    u:object_r:system_security_prop:s0
 ro.setupwizard.                                u:object_r:setupwizard_prop:s0
 ro.vendor.sec.radio.                           u:object_r:radio_prop:s0
+ro.vzw.sys.hw_ver                           u:object_r:vzw_sys_prop:s0
+ro.vzw.sys.sw_ver                           u:object_r:vzw_sys_prop:s0
 runtime.firstboot             u:object_r:system_prop:s0
 runtime.omadm.                                   u:object_r:system_prop:s0
 rw.km_fips_status	u:object_r:km_fips_prop:s0
