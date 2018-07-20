@@ -23,7 +23,7 @@ on init
     mkdir /mnt/knox/write/emulated 0700 root root
 
     # SDP USER 0, SECURE FS
-    mkdir /mnt/shell/enc_emulated 0700 root system
+    mkdir /mnt/shell/enc_emulated 0700 system system
     mkdir /mnt/shell/enc_media 0700 system system
     mkdir /mnt/runtime/default/enc_emulated 0755 system system
     mkdir /mnt/runtime/read/enc_emulated 0755 system system
@@ -76,13 +76,6 @@ on post-fs-data
     restorecon /data/knox
 
 on boot
-
-#group system log shell
-service epmlogd /system/bin/epmlogd
-    class main
-    user system
-    group system log shell
-    oneshot
 
 service sdp_cryptod /system/bin/sdp_cryptod
     class main
