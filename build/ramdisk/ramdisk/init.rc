@@ -546,11 +546,6 @@ on post-fs-data
     chown media system /dev/socket/uibc
     chmod 0775 /dev/socket/uibc
 
-    # VaultKeeper socket
-    mkdir /dev/socket/vaultkeeper 0770 system system
-    chown system system /dev/socket/vaultkeeper
-    chmod 0770 /dev/socket/vaultkeeper
-
     # barnswallow Daemon socket
     mkdir /dev/socket/bsd 0770 system system
 
@@ -1440,9 +1435,6 @@ service iod /system/bin/iod
     class main
     oneshot
     disabled
-
-service vaultkeeperd /system/bin/vaultkeeperd
-    class core
 
 # Barnswallow Daemon
 service bsd /system/bin/bsd
