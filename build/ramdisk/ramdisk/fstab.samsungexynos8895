@@ -5,7 +5,7 @@
 #<src>                                                  <mnt_point> <type>  <mnt_flags and options>                                                                                           <fs_mgr_flags>
 /dev/block/platform/11120000.ufs/by-name/SYSTEM         /system     ext4    ro,errors=panic,noload                                                                                            wait
 /dev/block/platform/11120000.ufs/by-name/CACHE          /cache      ext4    noatime,nosuid,nodev,noauto_da_alloc,discard,journal_checksum,data=ordered,errors=panic                                            wait,check
-/dev/block/platform/11120000.ufs/by-name/USERDATA       /data       ext4    noatime,nosuid,nodev,noauto_da_alloc,discard,journal_checksum,data=ordered,errors=panic                                            wait,check,forceencrypt=footer,quota
+/dev/block/platform/11120000.ufs/by-name/USERDATA       /data       ext4    noatime,nosuid,nodev,noauto_da_alloc,discard,journal_checksum,data=ordered,errors=panic                                            wait,check,encryptable=footer
 /dev/block/platform/11120000.ufs/by-name/EFS            /efs        ext4    noatime,nosuid,nodev,noauto_da_alloc,discard,journal_checksum,data=ordered,errors=panic                                            wait,check
 
 # ADD FOR GOTA
