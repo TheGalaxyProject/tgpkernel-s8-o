@@ -16,3 +16,4 @@ vendor.samsung.security.wsm::IWsmDaemon                         u:object_r:hal_w
 vendor.samsung_slsi.hardware.ExynosHWCServiceTW::IExynosHWCServiceTW  u:object_r:hal_exynos_hwservice:s0
 com.qualcomm.qti.ant::IAntHci              u:object_r:hal_bluetooth_hwservice:s0
 vendor.samsung.hardware.digitaltv.fullseg::IFullseg      u:object_r:digitaltv_fullseg_hwservice:s0
+vendor.samsung.hardware.dtvtuner::IDtvTuner               u:object_r:digitaltv_fullseg_hwservice:s0

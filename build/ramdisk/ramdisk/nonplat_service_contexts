@@ -140,6 +140,7 @@ sec.clipboard                               u:object_r:sec_clipboard_service:s0
 semclipboard                                u:object_r:semclipboard_service:s0
 firewall                                    u:object_r:firewall_service:s0
 freecess.packet.IFreecessPacket             u:object_r:sec_freecess_service:s0
+freecess.binder.IFrozenBinder               u:object_r:frozenbinder_service:s0
 AAS                                         u:object_r:AAS_service:s0
 ABTPersistenceService                       u:object_r:abt_persistence_service:s0
 AODManagerService                           u:object_r:aod_manager_service:s0
