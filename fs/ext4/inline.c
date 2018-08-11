@@ -18,6 +18,7 @@
 #include "ext4.h"
 #include "xattr.h"
 #include "truncate.h"
+#include <trace/events/android_fs.h>
 
 #define EXT4_XATTR_SYSTEM_DATA	"data"
 #define EXT4_MIN_INLINE_DATA_SIZE	((sizeof(__le32) * EXT4_N_BLOCKS))
@@ -502,6 +503,17 @@ int ext4_readpage_inline(struct inode *inode, struct page *page)
 		return -EAGAIN;
 	}
 
+	if (trace_android_fs_dataread_start_enabled()) {
+		char *path, pathbuf[MAX_TRACE_PATHBUF_LEN];
+
+		path = android_fstrace_get_pathname(pathbuf,
+						    MAX_TRACE_PATHBUF_LEN,
+						    inode);
+		trace_android_fs_dataread_start(inode, page_offset(page),
+						PAGE_SIZE, current->pid,
+						path, current->comm);
+	}
+
 	/*
 	 * Current inline data can only exist in the 1st page,
 	 * So for all the other pages, just set them uptodate.
@@ -512,6 +524,8 @@ int ext4_readpage_inline(struct inode *inode, struct page *page)
 		zero_user_segment(page, 0, PAGE_CACHE_SIZE);
 		SetPageUptodate(page);
 	}
+
+	trace_android_fs_dataread_end(inode, page_offset(page), PAGE_SIZE);
 
 	up_read(&EXT4_I(inode)->xattr_sem);
 
@@ -1004,12 +1018,11 @@ void ext4_show_inline_dir(struct inode *dir, struct buffer_head *bh,
  */
 static int ext4_add_dirent_to_inline(handle_t *handle,
 				     struct ext4_filename *fname,
-				     struct dentry *dentry,
+				     struct inode *dir,
 				     struct inode *inode,
 				     struct ext4_iloc *iloc,
 				     void *inline_start, int inline_size)
 {
-	struct inode	*dir = d_inode(dentry->d_parent);
 	int		err;
 	struct ext4_dir_entry_2 *de;
 
@@ -1253,12 +1266,11 @@ out:
  * the new created block.
  */
 int ext4_try_add_inline_entry(handle_t *handle, struct ext4_filename *fname,
-			      struct dentry *dentry, struct inode *inode)
+			      struct inode *dir, struct inode *inode)
 {
 	int ret, inline_size;
 	void *inline_start;
 	struct ext4_iloc iloc;
-	struct inode *dir = d_inode(dentry->d_parent);
 
 	ret = ext4_get_inode_loc(dir, &iloc);
 	if (ret)
@@ -1272,7 +1284,7 @@ int ext4_try_add_inline_entry(handle_t *handle, struct ext4_filename *fname,
 						 EXT4_INLINE_DOTDOT_SIZE;
 	inline_size = EXT4_MIN_INLINE_DATA_SIZE - EXT4_INLINE_DOTDOT_SIZE;
 
-	ret = ext4_add_dirent_to_inline(handle, fname, dentry, inode, &iloc,
+	ret = ext4_add_dirent_to_inline(handle, fname, dir, inode, &iloc,
 					inline_start, inline_size);
 	if (ret != -ENOSPC)
 		goto out;
@@ -1293,7 +1305,7 @@ int ext4_try_add_inline_entry(handle_t *handle, struct ext4_filename *fname,
 	if (inline_size) {
 		inline_start = ext4_get_inline_xattr_pos(dir, &iloc);
 
-		ret = ext4_add_dirent_to_inline(handle, fname, dentry,
+		ret = ext4_add_dirent_to_inline(handle, fname, dir,
 						inode, &iloc, inline_start,
 						inline_size);
 
@@ -1639,7 +1651,7 @@ struct buffer_head *ext4_find_inline_entry(struct inode *dir,
 						EXT4_INLINE_DOTDOT_SIZE;
 	inline_size = EXT4_MIN_INLINE_DATA_SIZE - EXT4_INLINE_DOTDOT_SIZE;
 	ret = ext4_search_dir(iloc.bh, inline_start, inline_size,
-			      dir, fname, d_name, 0, res_dir);
+			      dir, fname, d_name, 0, res_dir, NULL);
 	if (ret == 1)
 		goto out_find;
 	if (ret < 0)
@@ -1652,7 +1664,7 @@ struct buffer_head *ext4_find_inline_entry(struct inode *dir,
 	inline_size = ext4_get_inline_size(dir) - EXT4_MIN_INLINE_DATA_SIZE;
 
 	ret = ext4_search_dir(iloc.bh, inline_start, inline_size,
-			      dir, fname, d_name, 0, res_dir);
+			      dir, fname, d_name, 0, res_dir, NULL);
 	if (ret == 1)
 		goto out_find;
 
