@@ -502,6 +502,7 @@ on post-fs-data
     chmod 0660 /data/misc/wifi/wpa_supplicant.conf
     mkdir /data/local 0751 root root
     mkdir /data/misc/media 0700 media media
+    mkdir /data/misc/mediacodec 0700 mediacodec mediacodec
     mkdir /data/misc/audioserver 0700 audioserver audioserver
     mkdir /data/misc/cameraserver 0700 cameraserver cameraserver
     mkdir /data/misc/vold 0700 root root
@@ -679,6 +680,14 @@ on post-fs-data
 
 # smart switch mobile
     mkdir /efs/ssm 0770 system system
+    
+    # super slow motion
+    mkdir /data/misc/mediacodec/fruc_files 0700 mediacodec mediacodec
+    mkdir /data/misc/mediacodec/fruc_assets 0700 mediacodec mediacodec
+    copy /system/media/fruc_kernels.s9.slsi.bin /data/misc/mediacodec/fruc_assets/fruc_kernels.s9.slsi.bin
+    copy /system/media/fruc_kernels.s8.slsi.bin /data/misc/mediacodec/fruc_assets/fruc_kernels.s8.slsi.bin
+    chown mediacodec mediacodec /data/misc/mediacodec/fruc_assets/fruc_kernels.s8.slsi.bin
+    chown mediacodec mediacodec /data/misc/mediacodec/fruc_assets/fruc_kernels.s9.slsi.bin
 
     # If there is no post-fs-data action in the init.<device>.rc file, you
     # must uncomment this line, otherwise encrypted filesystems

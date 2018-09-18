@@ -6,6 +6,7 @@ user=_app seinfo=trusted_dmb name=com.omnitel* domain=filtered_untrusted_app typ
 user=_app seinfo=platform name=com.samsung.android.oneconnect* domain=sec_untrusted_app type=app_data_file levelFrom=user
 user=_app seinfo=aasa_platform domain=aasa_platform_app type=app_data_file levelFrom=user
 user=_app seinfo=aasa_blocked domain=blocked_app type=app_data_file levelFrom=user
+user=system seinfo=aasa_blocked domain=blocked_app type=app_data_file
 user=_app seinfo=filtered_untrusted name=com.expway.embmsserver* domain=filtered_untrusted_app type=app_data_file levelFrom=user
 user=_app seinfo=filtered_untrusted name=com.jio.emiddleware domain=filtered_untrusted_app type=app_data_file levelFrom=user
 user=_app seinfo=Reliance_Jio domain=filtered_untrusted_app type=app_data_file levelFrom=user
@@ -13,6 +14,7 @@ user=_app seinfo=trustonicpartner domain=trustonicpartner_app type=app_data_file
 user=_app seinfo=good_trustonicpartner domain=trustonicpartner_app type=app_data_file levelFrom=user
 user=oneseg domain=oneseg_apk type=app_data_file levelFrom=user
 user=system seinfo=platform name=com.policydm domain=policyloader_app type=policyloader_app_data_file
+user=system seinfo=platform name=com.samsung.android.spdclient domain=policyloader_app type=policyloader_app_data_file
 user=_app seinfo=platform name=com.gd.mobicore.pa domain=mobicore_app type=app_data_file levelFrom=user
 user=_app seinfo=platform name=com.trustonic.tuiservice domain=mobicore_app type=app_data_file levelFrom=user
 user=_app seinfo=vzw_untrusted domain=vzwfiltered_untrusted_app type=app_data_file levelFrom=user
