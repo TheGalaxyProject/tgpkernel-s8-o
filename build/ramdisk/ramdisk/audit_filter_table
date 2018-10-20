@@ -365,6 +365,7 @@ auditfilter webview_zygote cgroup:dir setattr;
 auditfilter webview_zygote tombstoned_crash_socket:sock_file write; comm="main" 
 auditfilter wificond system_app:fd use;
 auditfilter wlandutservice binder_device:chr_file { read write };
+auditfilter zygote untrusted_app:process ptrace;
 auditfilter zygote untrusted_app_25:process ptrace;
 
 # http://mobilerndhub.sec.samsung.net/hub/site/seandroid/board/O_review_request/view/22696619
