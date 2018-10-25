@@ -5438,6 +5438,7 @@ new_range:
 			start = TCP_SKB_CB(skb)->seq;
 		if (after(TCP_SKB_CB(skb)->end_seq, end))
 			end = TCP_SKB_CB(skb)->end_seq;
+			range_truesize = skb->truesize;
 	}
 }
 
