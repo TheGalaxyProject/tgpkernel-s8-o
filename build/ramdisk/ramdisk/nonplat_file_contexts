@@ -311,7 +311,6 @@
 /data/security/spota(/.*)?		u:object_r:security_spota_file:s0
 /data/system/yas_lib(/.*)?		u:object_r:yas_lib_file:s0
 /data/misc/integrity(/.*)?		u:object_r:audit_log:s0
-/dev/\.secure_storage(/.*)?		u:object_r:secure_storage_device:s0
 /sys/class/backlight(/.*)?		--	u:object_r:sysfs_ss_writable:s0
 /sys/class/leds/led_[1-4](/.*)?		--	u:object_r:sysfs_led_writable:s0
 /dev/block/platform/.+/by-name/SBFS		u:object_r:sbfs_block_device:s0
@@ -403,7 +402,6 @@
 /sys/class/devfreq/bus_int.6/time_in_state_raw		u:object_r:sf_time_in_state:s0
 /system/python/lwshield/run.pyc		u:object_r:python_exec:s0
 /sys/kernel/debug/frontswap(/.*)?		u:object_r:sec_debugfs:s0
-/data/system/secure_storage(/.*)?		u:object_r:secure_storage_data_file:s0
 /sys/class/devfreq/17000020.bus_mif/time_in_state_raw		u:object_r:sf_time_in_state:s0
 /sys/class/devfreq/17000010.bus_int/time_in_state_raw		u:object_r:sf_time_in_state:s0
 /data/data/com\.android\.shell(/.*)?		u:object_r:shell_data_file:s0
