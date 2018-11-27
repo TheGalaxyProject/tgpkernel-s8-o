@@ -78,6 +78,7 @@ auditfilter hal_drm_default app_data_file:file write;
 auditfilter hal_drm_default radio_data_file:file write;
 auditfilter hal_drm_default sec_efs_file:file read;
 auditfilter hal_drm_default system_app_data_file:file write;
+auditfilter hal_drm_default tz_user_device:chr_file { read write };
 auditfilter hal_drm_default untrusted_app:fd use;
 auditfilter hal_graphics_composer_default sysfs:file read;
 auditfilter hal_graphics_composer_default diag_device:chr_file { read write };
@@ -145,6 +146,7 @@ auditfilter platform_app sysfs_leds:lnk_file { getattr read };
 auditfilter platform_app system_server:unix_stream_socket ioctl;
 auditfilter platform_app tee_device:chr_file { read write };
 auditfilter platform_app time_daemon:unix_stream_socket connectto;
+auditfilter platform_app tz_user_device:chr_file { read write open };
 auditfilter platform_app vold_socket:sock_file getattr;
 auditfilter platform_app zygote:unix_dgram_socket getattr;
 auditfilter policyloader_app overlay_service:service_manager find;
@@ -188,6 +190,7 @@ auditfilter qti_init_shell proc:dir write;
 auditfilter qti_init_shell sensors_persist_file:dir add_name; name="registry"
 auditfilter qti_init_shell shell_exec:file { execute execute_no_trans };
 auditfilter qti_init_shell sysfs:dir write;
+auditfilter qti_init_shell tracing_shell_writable_debug:file write;
 auditfilter qti_init_shell usb_configfs:dir write;
 auditfilter qti_init_shell vendor_file:file entrypoint;
 auditfilter radio app_data_file:file execute;
@@ -207,6 +210,7 @@ auditfilter sdcardd users_system_data_file:file read;
 auditfilter sdcardd unlabeled:file read;
 auditfilter sec_untrusted_app proc:file getattr;
 auditfilter sem vendor_app_file:dir search;
+auditfilter sensors sysfs:file read;
 auditfilter sensors diag_device:chr_file { read write };
 auditfilter sgdisk sgdisk:capability { dac_override dac_read_search };
 auditfilter sgdisk userdata_block_device:blk_file { read write };
@@ -217,6 +221,7 @@ auditfilter shell remotedisplay:binder call;
 auditfilter shell rootfs:file getattr;
 auditfilter shell vdc_exec:file execute;
 auditfilter shell wificond:binder call;
+auditfilter sn storage_file:dir search;
 auditfilter ss_conn_daemon sysfs:file read;
 auditfilter storaged ap_device:dir search;
 auditfilter storaged debugfs_mmc:dir search;
@@ -237,6 +242,7 @@ auditfilter system_app netd_service:service_manager find;
 auditfilter system_app null_device:chr_file setattr;
 auditfilter system_app qcom_ims_prop:file { read open getattr };
 auditfilter system_app serialno_prop:file read;
+auditfilter system_app sf_rtt_file:file read; name="rtt_dump.txt"
 auditfilter system_app system_app:capability net_admin;
 auditfilter system_app system_data_file:dir write;
 auditfilter system_app tee_device:chr_file { read write };
@@ -826,4 +832,16 @@ auditfilter system_server share_via_app_data_file:dir search; comm="PersonaManag
 
 # P180827-02218
 auditfilter sdunion_storagevold system_app:fd use;
+
+# http://mobilerndhub.sec.samsung.net/its/projects/SEANDROID/issues/SEANDROID-184
+auditfilter hal_gnss_default hal_gnss_default:udp_socket create;
+
+# http://mobilerndhub.sec.samsung.net/hub/site/seandroid/board/O_review_request/view/23623419
+auditfilter platform_app mba_debug_dev:blk_file getattr;
+
+# http://mobilerndhub.sec.samsung.net/its/browse/SEANDROID-350
+auditfilter platform_app firmware_file:lnk_file read;
+
+# DEV P181025-06269
+auditfilter idmap sdcardfs:file { read wrtie };
 
