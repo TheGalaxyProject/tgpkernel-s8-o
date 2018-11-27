@@ -299,13 +299,7 @@ enum dhd_op_flags {
 #define DHD_SCAN_DEF_TIMEOUT 10000 /* ms: Max time out for scan in progress */
 #endif
 
-#ifndef CONFIG_BCMDHD_CLM_PATH
-#if defined(CUSTOMER_HW4) && defined(PLATFORM_SLP)
-#define CONFIG_BCMDHD_CLM_PATH "/lib/firmware/bcmdhd_clm.blob"
-#else
 #define CONFIG_BCMDHD_CLM_PATH "/etc/wifi/bcmdhd_clm.blob"
-#endif /* CUSTOMER_HW4 && PLATFORM_SLP */
-#endif /* CONFIG_BCMDHD_CLM_PATH */
 #define WL_CCODE_NULL_COUNTRY  "#n"
 
 #define FW_VER_STR_LEN	128
@@ -2126,26 +2120,9 @@ extern uint dhd_pktgen_len;
 extern char fw_path2[MOD_PARAM_PATHLEN];
 #endif
 
-#if defined(ANDROID_PLATFORM_VERSION)
-#if (ANDROID_PLATFORM_VERSION < 7)
-#define DHD_LEGACY_FILE_PATH
-#define VENDOR_PATH "/system"
-#elif (ANDROID_PLATFORM_VERSION == 7)
-#define VENDOR_PATH "/system"
-#elif (ANDROID_PLATFORM_VERSION >= 8)
 #define VENDOR_PATH "/vendor"
-#endif /* ANDROID_PLATFORM_VERSION < 7 */
-#else
-#define VENDOR_PATH ""
-#endif /* ANDROID_PLATFORM_VERSION */
 
-#ifdef DHD_LEGACY_FILE_PATH
-#define PLATFORM_PATH	"/data/"
-#elif defined(PLATFORM_SLP)
-#define PLATFORM_PATH	"/opt/etc/"
-#else
 #define PLATFORM_PATH	"/data/misc/conn/"
-#endif /* DHD_LEGACY_FILE_PATH */
 
 /* Flag to indicate if we should download firmware on driver load */
 extern uint dhd_download_fw_on_driverload;
