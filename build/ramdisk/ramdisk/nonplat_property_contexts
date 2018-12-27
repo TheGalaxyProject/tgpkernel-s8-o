@@ -57,6 +57,7 @@ persist.security.tlc.	    u:object_r:tlc_mgmt_prop:s0
 persist.security.ucs.csname                 u:object_r:ucs_prop:s0
 persist.security.ucs                        u:object_r:ucs_prop:s0
 persist.soc_camera.             u:object_r:sec_camera_prop:s0
+persist.spay.transitcard			u:object_r:spay_prop:s0
 persist.sys.camera.              u:object_r:sec_camera_prop:s0
 persist.sys.drs.date		u:object_r:drs_date_prop:s0
 persist.sys.enable_rescue            u:object_r:enable_rescue_prop:s0

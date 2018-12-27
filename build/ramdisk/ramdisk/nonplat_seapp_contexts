@@ -10,6 +10,7 @@ user=system seinfo=aasa_blocked domain=blocked_app type=app_data_file
 user=_app seinfo=filtered_untrusted name=com.expway.embmsserver* domain=filtered_untrusted_app type=app_data_file levelFrom=user
 user=_app seinfo=filtered_untrusted name=com.jio.emiddleware domain=filtered_untrusted_app type=app_data_file levelFrom=user
 user=_app seinfo=Reliance_Jio domain=filtered_untrusted_app type=app_data_file levelFrom=user
+user=_app seinfo=rjio domain=filtered_untrusted_app type=app_data_file levelFrom=user
 user=_app seinfo=trustonicpartner domain=trustonicpartner_app type=app_data_file levelFrom=user
 user=_app seinfo=good_trustonicpartner domain=trustonicpartner_app type=app_data_file levelFrom=user
 user=oneseg domain=oneseg_apk type=app_data_file levelFrom=user
