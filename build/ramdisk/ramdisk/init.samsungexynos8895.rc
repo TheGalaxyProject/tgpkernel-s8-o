@@ -535,7 +535,6 @@ on fs
     chown system system /sys/class/lcd/panel/SVC_OCTA
     chown system system /sys/class/lcd/panel/xtalk_mode
     chown system system /sys/class/lcd/panel/poc
-    chown system system /sys/class/lcd/panel/poc_onoff
 
 # Permissions for LCD COPR
     chown system system /sys/class/lcd/panel/copr
